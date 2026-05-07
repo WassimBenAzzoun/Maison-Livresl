@@ -18,6 +18,7 @@ services:
         condition: service_healthy
     volumes:
       - ./:/var/www/html
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
 
   db:
     image: mysql:8.0

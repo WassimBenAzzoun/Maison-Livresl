@@ -2,6 +2,8 @@
 
 class LivreController extends Controller
 {
+    private const MAX_COVER_UPLOAD_SIZE = 5242880;
+
     public function index(): void
     {
         $livreModel = new Livre();
@@ -75,6 +77,7 @@ class LivreController extends Controller
                 'total_exemplaires' => (int) ($_POST['total_exemplaires'] ?? 0),
                 'available_exemplaires' => (int) ($_POST['available_exemplaires'] ?? 0),
             ];
+            $uploadedCover = $this->handleCoverUpload($_FILES['cover_upload'] ?? null);
 
             if ($data['titre'] === '' || $data['auteur'] === '' || $data['categorie'] === '') {
                 $this->flash('warning', 'Veuillez remplir les champs obligatoires.');
@@ -82,10 +85,18 @@ class LivreController extends Controller
                 $this->flash('warning', 'Le nombre total d\'exemplaires doit être supérieur à zéro.');
             } elseif ($data['available_exemplaires'] < 0 || $data['available_exemplaires'] > $data['total_exemplaires']) {
                 $this->flash('warning', 'Les exemplaires disponibles doivent être compris entre 0 et le total.');
+            } elseif ($uploadedCover === false) {
+                $this->redirect('admin-book-form', $id > 0 ? ['id' => $id] : []);
             } elseif ($id > 0) {
+                if (is_string($uploadedCover)) {
+                    $data['couverture'] = $uploadedCover;
+                }
                 $model->update($id, $data);
                 $this->flash('success', 'Livre mis à jour avec succès.');
             } else {
+                if (is_string($uploadedCover)) {
+                    $data['couverture'] = $uploadedCover;
+                }
                 $model->create($data);
                 $this->flash('success', 'Livre ajouté avec succès.');
             }
@@ -112,5 +123,61 @@ class LivreController extends Controller
         }
 
         $this->redirect('admin-books');
+    }
+
+    private function handleCoverUpload(?array $file): string|false|null
+    {
+        if (!$file || !isset($file['error'])) {
+            return null;
+        }
+
+        if ((int) $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+
+        if ((int) $file['error'] !== UPLOAD_ERR_OK) {
+            $this->flash('warning', 'Le téléversement de la couverture a échoué.');
+            return false;
+        }
+
+        if ((int) ($file['size'] ?? 0) > self::MAX_COVER_UPLOAD_SIZE) {
+            $this->flash('warning', 'L\'image de couverture ne doit pas dépasser 5 Mo.');
+            return false;
+        }
+
+        $tmpName = $file['tmp_name'] ?? '';
+        if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+            $this->flash('warning', 'Fichier de couverture invalide.');
+            return false;
+        }
+
+        $mimeType = mime_content_type($tmpName) ?: '';
+        $allowedExtensions = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+        ];
+
+        if (!isset($allowedExtensions[$mimeType])) {
+            $this->flash('warning', 'Formats acceptés : JPG, PNG, WEBP ou GIF.');
+            return false;
+        }
+
+        $uploadDir = BASE_PATH . '/public/assets/uploads/books';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            $this->flash('warning', 'Impossible de créer le dossier des couvertures.');
+            return false;
+        }
+
+        $filename = sprintf('book-%s-%s.%s', date('YmdHis'), bin2hex(random_bytes(4)), $allowedExtensions[$mimeType]);
+        $destination = $uploadDir . '/' . $filename;
+
+        if (!move_uploaded_file($tmpName, $destination)) {
+            $this->flash('warning', 'Impossible d\'enregistrer l\'image de couverture.');
+            return false;
+        }
+
+        return 'assets/uploads/books/' . $filename;
     }
 }

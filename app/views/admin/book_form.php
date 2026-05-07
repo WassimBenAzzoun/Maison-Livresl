@@ -5,7 +5,7 @@
         <p>Formulaire simple avec stockage PDO.</p>
     </div>
 
-    <form class="panel form-stack" method="post" data-validate>
+    <form class="panel form-stack" method="post" enctype="multipart/form-data" data-validate>
         <label>Bibliothèque
             <select class="form-control" name="bibliotheque_id">
                 <option value="">Choisir une bibliothèque</option>
@@ -32,8 +32,18 @@
             <textarea class="form-control" name="description" rows="5"><?= e($livre->getDescription()) ?></textarea>
         </label>
         <label>Lien de couverture
-            <input class="form-control" type="text" name="couverture" value="<?= e($livre->getCouverture()) ?>" placeholder="assets/images/book-placeholder.svg">
+            <input class="form-control" type="text" name="couverture" value="<?= e($livre->getCouverture()) ?>" placeholder="https://... ou assets/uploads/books/mon-livre.jpg">
         </label>
+        <label>Importer une image de couverture
+            <input class="form-control" type="file" name="cover_upload" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif">
+            <small class="muted">L'import remplace le lien si les deux sont fournis.</small>
+        </label>
+        <?php if ($livre->getCouverture() !== ''): ?>
+            <div class="detail-card">
+                <p class="muted">Couverture actuelle</p>
+                <img src="<?= e($livre->getCouverture()) ?>" alt="<?= e($livre->getTitre() ?: 'Couverture du livre') ?>" class="detail-cover">
+            </div>
+        <?php endif; ?>
         <div class="grid cards-2">
             <label>Exemplaires totaux
                 <input class="form-control" type="number" name="total_exemplaires" value="<?= e((string) $livre->getTotalExemplaires()) ?>">
