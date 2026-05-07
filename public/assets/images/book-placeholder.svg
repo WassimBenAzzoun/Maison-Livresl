@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Couverture de livre">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#18a999"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" rx="36" fill="url(#g1)"/>
+  <rect x="52" y="52" width="496" height="696" rx="28" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/>
+  <rect x="110" y="120" width="150" height="14" rx="7" fill="url(#g2)"/>
+  <rect x="110" y="160" width="240" height="18" rx="9" fill="rgba(255,255,255,0.8)"/>
+  <rect x="110" y="198" width="190" height="18" rx="9" fill="rgba(255,255,255,0.65)"/>
+  <circle cx="400" cy="285" r="86" fill="rgba(255,255,255,0.16)"/>
+  <path d="M372 245h56l-8 126-20-24-20 24-8-126Z" fill="#fff7ed"/>
+  <rect x="110" y="505" width="360" height="14" rx="7" fill="rgba(255,255,255,0.45)"/>
+  <rect x="110" y="540" width="300" height="14" rx="7" fill="rgba(255,255,255,0.3)"/>
+  <rect x="110" y="575" width="260" height="14" rx="7" fill="rgba(255,255,255,0.24)"/>
+  <rect x="110" y="645" width="170" height="46" rx="23" fill="#fff7ed"/>
+</svg>
