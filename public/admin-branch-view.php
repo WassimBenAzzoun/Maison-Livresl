@@ -18,7 +18,8 @@ $branch = $model->find($id);
 
 if (!$branch) {
     flash_set('danger', 'Point de service introuvable.');
-    redirect_page('admin-branches');
+    header('Location: admin-branches.php');
+    exit;
 }
 
 $books = $model->booksById($id);
@@ -37,19 +38,19 @@ require __DIR__ . '/partials/header.php';
     <div class="split-layout">
         <div class="panel">
             <div class="panel-head">
-                <h2><?= e($branch->getNom()) ?></h2>
-                <span class="badge badge-info"><?= e($branch->getVille()) ?></span>
+                <h2><?= htmlspecialchars($branch->getNom(), ENT_QUOTES, 'UTF-8') ?></h2>
+                <span class="badge badge-info"><?= htmlspecialchars($branch->getVille(), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <ul class="info-list">
-                <li><strong>Adresse :</strong> <?= e($branch->getAdresse()) ?></li>
-                <li><strong>Téléphone :</strong> <?= e($branch->getTelephone() ?: '-') ?></li>
-                <li><strong>Livres :</strong> <?= e((string) $branch->getBookCount()) ?></li>
-                <li><strong>Emprunts actifs :</strong> <?= e((string) $branch->getCurrentBorrowingsCount()) ?></li>
+                <li><strong>Adresse :</strong> <?= htmlspecialchars($branch->getAdresse(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Téléphone :</strong> <?= htmlspecialchars($branch->getTelephone() ?: '-', ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Livres :</strong> <?= htmlspecialchars((string) $branch->getBookCount(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Emprunts actifs :</strong> <?= htmlspecialchars((string) $branch->getCurrentBorrowingsCount(), ENT_QUOTES, 'UTF-8') ?></li>
             </ul>
-            <p><?= e($branch->getDescription() ?: 'Aucune description renseignée.') ?></p>
+            <p><?= htmlspecialchars($branch->getDescription() ?: 'Aucune description renseignée.', ENT_QUOTES, 'UTF-8') ?></p>
             <div class="card-actions">
-                <a class="btn btn-primary" href="<?= url('admin-branch-form', ['id' => $branch->getId()]) ?>">Modifier</a>
-                <a class="btn btn-secondary" href="<?= url('admin-branches') ?>">Retour à la liste</a>
+                <a class="btn btn-primary" href="<?= 'admin-branch-form.php?id=' . rawurlencode((string) ($branch->getId())) ?>">Modifier</a>
+                <a class="btn btn-secondary" href="<?= 'admin-branches.php' ?>">Retour à la liste</a>
             </div>
         </div>
 
@@ -91,16 +92,16 @@ require __DIR__ . '/partials/header.php';
                 <?php foreach ($books as $book): ?>
                     <?php $available = $book->getAvailableExemplaires() > 0; ?>
                     <tr
-                        data-search="<?= e(strtolower($book->getTitre() . ' ' . $book->getAuteur() . ' ' . $book->getCategorie())) ?>"
-                        data-sort-title="<?= e(strtolower($book->getTitre())) ?>"
-                        data-sort-author="<?= e(strtolower($book->getAuteur())) ?>"
-                        data-sort-available="<?= e((string) $book->getAvailableExemplaires()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower($book->getTitre() . ' ' . $book->getAuteur() . ' ' . $book->getCategorie()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-title="<?= htmlspecialchars(strtolower($book->getTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-author="<?= htmlspecialchars(strtolower($book->getAuteur()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-available="<?= htmlspecialchars((string) $book->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td><a class="table-link" href="<?= url('book', ['id' => $book->getId()]) ?>"><?= e($book->getTitre()) ?></a></td>
-                        <td><?= e($book->getAuteur()) ?></td>
-                        <td><?= e($book->getCategorie()) ?></td>
-                        <td><?= e((string) $book->getAnneePublication()) ?></td>
-                        <td><span class="badge <?= $available ? 'badge-success' : 'badge-danger' ?>"><?= e((string) $book->getAvailableExemplaires()) ?></span></td>
+                        <td><a class="table-link" href="<?= 'book.php?id=' . rawurlencode((string) ($book->getId())) ?>"><?= htmlspecialchars($book->getTitre(), ENT_QUOTES, 'UTF-8') ?></a></td>
+                        <td><?= htmlspecialchars($book->getAuteur(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($book->getCategorie(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $book->getAnneePublication(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= $available ? 'badge-success' : 'badge-danger' ?>"><?= htmlspecialchars((string) $book->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -139,18 +140,18 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($currentBorrowings as $borrow): ?>
                     <tr
-                        data-search="<?= e(strtolower('#' . $borrow->getId() . ' ' . $borrow->getUserName() . ' ' . $borrow->getLivreTitre() . ' ' . status_label($borrow->getStatus()))) ?>"
-                        data-sort-ref="<?= e((string) $borrow->getId()) ?>"
-                        data-sort-user="<?= e(strtolower($borrow->getUserName() ?: $borrow->getFullName())) ?>"
-                        data-sort-book="<?= e(strtolower($borrow->getLivreTitre())) ?>"
-                        data-sort-return="<?= e($borrow->getReturnDate()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower('#' . $borrow->getId() . ' ' . $borrow->getUserName() . ' ' . $borrow->getLivreTitre() . ' ' . status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-ref="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-user="<?= htmlspecialchars(strtolower($borrow->getUserName() ?: $borrow->getFullName()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-book="<?= htmlspecialchars(strtolower($borrow->getLivreTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-return="<?= htmlspecialchars($borrow->getReturnDate(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td>#<?= e((string) $borrow->getId()) ?></td>
-                        <td><?= e($borrow->getUserName() ?: $borrow->getFullName()) ?></td>
-                        <td><?= e($borrow->getLivreTitre()) ?></td>
-                        <td><?= e(format_date_fr($borrow->getBorrowDate())) ?></td>
-                        <td><?= e(format_date_fr($borrow->getReturnDate())) ?></td>
-                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= e(status_label($borrow->getStatus())) ?></span></td>
+                        <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= htmlspecialchars(status_label($borrow->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -26,7 +26,7 @@ require __DIR__ . '/partials/header.php';
         <h1>Des livres inspirants, des espaces accueillants et un service simple pour vos lectures.</h1>
         <p>Découvrez une maison dédiée à la lecture, avec un catalogue soigné, des points de service pratiques et un accompagnement fluide pour vos emprunts.</p>
         <div class="hero-actions">
-            <a class="btn btn-primary" href="<?= url('books') ?>">Découvrir le catalogue</a>
+            <a class="btn btn-primary" href="<?= 'books.php' ?>">Découvrir le catalogue</a>
             <a class="btn btn-secondary" href="#carte-bibliotheques">Voir nos points de service</a>
         </div>
     </div>
@@ -50,13 +50,13 @@ require __DIR__ . '/partials/header.php';
     <div class="grid cards-3">
         <?php foreach ($livres as $livre): ?>
             <article class="card book-card">
-                <img src="<?= e($livre->getCouverture() ?: 'assets/images/book-placeholder.svg') ?>" alt="<?= e($livre->getTitre()) ?>" class="book-cover">
+                <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
                 <div class="card-body">
-                    <span class="tag"><?= e($livre->getCategorie()) ?></span>
-                    <h3><?= e($livre->getTitre()) ?></h3>
-                    <p><?= e($livre->getAuteur()) ?> · <?= e((string) $livre->getAnneePublication()) ?></p>
-                    <p class="muted"><?= e($livre->getBibliothequeNom() ?? 'Point de service non défini') ?></p>
-                    <a class="btn btn-link" href="<?= url('book', ['id' => $livre->getId()]) ?>">Détails</a>
+                    <span class="tag"><?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></span>
+                    <h3><?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?></h3>
+                    <p><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars((string) $livre->getAnneePublication(), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="muted"><?= htmlspecialchars($livre->getBibliothequeNom() ?? 'Point de service non défini', ENT_QUOTES, 'UTF-8') ?></p>
+                    <a class="btn btn-link" href="<?= 'book.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Détails</a>
                 </div>
             </article>
         <?php endforeach; ?>
@@ -74,10 +74,10 @@ require __DIR__ . '/partials/header.php';
         <div class="panel">
             <?php foreach ($bibliotheques as $bibliotheque): ?>
                 <article class="mini-location">
-                    <h3><?= e($bibliotheque['nom']) ?></h3>
-                    <p><?= e($bibliotheque['adresse']) ?>, <?= e($bibliotheque['ville']) ?></p>
-                    <p><?= e($bibliotheque['telephone']) ?></p>
-                    <p><?= e((string) ($bibliotheque['book_count'] ?? 0)) ?> ouvrage(s)</p>
+                    <h3><?= htmlspecialchars($bibliotheque['nom'], ENT_QUOTES, 'UTF-8') ?></h3>
+                    <p><?= htmlspecialchars($bibliotheque['adresse'], ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars($bibliotheque['ville'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars($bibliotheque['telephone'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p><?= htmlspecialchars((string) ($bibliotheque['book_count'] ?? 0), ENT_QUOTES, 'UTF-8') ?> ouvrage(s)</p>
                 </article>
             <?php endforeach; ?>
         </div>

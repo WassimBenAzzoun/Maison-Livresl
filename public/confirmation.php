@@ -16,7 +16,8 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $emprunt = (new Emprunt())->find($id);
 if (!$emprunt) {
     flash_set('danger', 'Confirmation introuvable.');
-    redirect_page('my-borrowings');
+    header('Location: my-borrowings.php');
+    exit;
 }
 
 $pageTitle = 'Maison des Livres | Confirmation';
@@ -32,20 +33,20 @@ require __DIR__ . '/partials/header.php';
 
     <div class="panel confirmation-panel">
         <ul class="info-list">
-            <li><strong>Référence :</strong> #<?= e((string) $emprunt->getId()) ?></li>
-            <li><strong>Livre :</strong> <?= e($emprunt->getLivreTitre()) ?></li>
-            <li><strong>Bibliothèque :</strong> <?= e($emprunt->getBibliothequeNom()) ?></li>
-            <li><strong>Nom :</strong> <?= e($emprunt->getFullName()) ?></li>
-            <li><strong>Email :</strong> <?= e($emprunt->getEmail()) ?></li>
-            <li><strong>Téléphone :</strong> <?= e($emprunt->getPhone()) ?></li>
-            <li><strong>Début :</strong> <?= e(format_date_fr($emprunt->getBorrowDate())) ?></li>
-            <li><strong>Retour :</strong> <?= e(format_date_fr($emprunt->getReturnDate())) ?></li>
-            <li><strong>Statut :</strong> <span class="badge <?= badge_class($emprunt->getStatus()) ?>"><?= e(status_label($emprunt->getStatus())) ?></span></li>
+            <li><strong>Référence :</strong> #<?= htmlspecialchars((string) $emprunt->getId(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Livre :</strong> <?= htmlspecialchars($emprunt->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Bibliothèque :</strong> <?= htmlspecialchars($emprunt->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Nom :</strong> <?= htmlspecialchars($emprunt->getFullName(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Email :</strong> <?= htmlspecialchars($emprunt->getEmail(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Téléphone :</strong> <?= htmlspecialchars($emprunt->getPhone(), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Début :</strong> <?= htmlspecialchars(format_date_fr($emprunt->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Retour :</strong> <?= htmlspecialchars(format_date_fr($emprunt->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></li>
+            <li><strong>Statut :</strong> <span class="badge <?= badge_class($emprunt->getStatus()) ?>"><?= htmlspecialchars(status_label($emprunt->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></li>
         </ul>
 
         <div class="card-actions">
-            <a class="btn btn-primary" href="<?= url('my-borrowings') ?>">Voir mes emprunts</a>
-            <a class="btn btn-secondary" href="<?= url('books') ?>">Retour au catalogue</a>
+            <a class="btn btn-primary" href="<?= 'my-borrowings.php' ?>">Voir mes emprunts</a>
+            <a class="btn btn-secondary" href="<?= 'books.php' ?>">Retour au catalogue</a>
         </div>
     </div>
 </section>

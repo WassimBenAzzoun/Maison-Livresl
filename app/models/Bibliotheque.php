@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/Emprunt.php';
+require_once __DIR__ . '/Livre.php';
+
 class Bibliotheque extends Model
 {
     private ?int $id = null;

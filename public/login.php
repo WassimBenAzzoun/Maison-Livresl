@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         session_regenerate_id(true);
         flash_set('success', 'Connexion réussie.');
-        redirect_page($user->getRole() === 'admin' ? 'admin-dashboard' : 'profile');
+        header('Location: ' . ($user->getRole() === 'admin' ? 'admin-dashboard.php' : 'profile.php'));
+        exit;
     }
 
     flash_set('danger', 'Identifiants invalides ou compte inactif.');
@@ -55,7 +56,7 @@ require __DIR__ . '/partials/header.php';
             <input class="form-control" type="password" name="password" required>
         </label>
         <button class="btn btn-primary" type="submit">Entrer</button>
-        <p class="muted">Pas encore de compte ? <a href="<?= url('register') ?>">Créer un accès</a></p>
+        <p class="muted">Pas encore de compte ? <a href="<?= 'register.php' ?>">Créer un accès</a></p>
     </form>
 </section>
 

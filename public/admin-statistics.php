@@ -42,16 +42,16 @@ require __DIR__ . '/partials/header.php';
     </div>
 
     <div class="grid cards-4">
-        <article class="stat-card"><span>Livres</span><strong><?= e((string) $stats['total_books']) ?></strong></article>
-        <article class="stat-card"><span>Disponibles</span><strong><?= e((string) $stats['available_books']) ?></strong></article>
-        <article class="stat-card"><span>Emprunts</span><strong><?= e((string) $stats['total_borrowings']) ?></strong></article>
-        <article class="stat-card"><span>Utilisateurs</span><strong><?= e((string) $stats['total_users']) ?></strong></article>
+        <article class="stat-card"><span>Livres</span><strong><?= htmlspecialchars((string) $stats['total_books'], ENT_QUOTES, 'UTF-8') ?></strong></article>
+        <article class="stat-card"><span>Disponibles</span><strong><?= htmlspecialchars((string) $stats['available_books'], ENT_QUOTES, 'UTF-8') ?></strong></article>
+        <article class="stat-card"><span>Emprunts</span><strong><?= htmlspecialchars((string) $stats['total_borrowings'], ENT_QUOTES, 'UTF-8') ?></strong></article>
+        <article class="stat-card"><span>Utilisateurs</span><strong><?= htmlspecialchars((string) $stats['total_users'], ENT_QUOTES, 'UTF-8') ?></strong></article>
     </div>
 
     <div class="grid cards-3 mt-24">
-        <article class="stat-card soft"><span>En attente</span><strong><?= e((string) $stats['pending_borrowings']) ?></strong></article>
-        <article class="stat-card soft"><span>Confirmés</span><strong><?= e((string) $stats['confirmed_borrowings']) ?></strong></article>
-        <article class="stat-card soft"><span>Retournés</span><strong><?= e((string) $stats['returned_borrowings']) ?></strong></article>
+        <article class="stat-card soft"><span>En attente</span><strong><?= htmlspecialchars((string) $stats['pending_borrowings'], ENT_QUOTES, 'UTF-8') ?></strong></article>
+        <article class="stat-card soft"><span>Confirmés</span><strong><?= htmlspecialchars((string) $stats['confirmed_borrowings'], ENT_QUOTES, 'UTF-8') ?></strong></article>
+        <article class="stat-card soft"><span>Retournés</span><strong><?= htmlspecialchars((string) $stats['returned_borrowings'], ENT_QUOTES, 'UTF-8') ?></strong></article>
     </div>
 
     <div class="charts-grid">

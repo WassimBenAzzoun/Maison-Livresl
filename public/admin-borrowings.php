@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect_page('admin-borrowings');
+    header('Location: admin-borrowings.php');
+    exit;
 }
 
 $pageTitle = 'Maison des Livres | Gestion des emprunts';
@@ -95,46 +96,46 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($emprunts as $borrow): ?>
                     <tr
-                        data-search="<?= e(strtolower('#' . $borrow->getId() . ' ' . $borrow->getUserName() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus()))) ?>"
-                        data-sort-ref="<?= e((string) $borrow->getId()) ?>"
-                        data-sort-user="<?= e(strtolower($borrow->getUserName() ?: $borrow->getFullName())) ?>"
-                        data-sort-book="<?= e(strtolower($borrow->getLivreTitre())) ?>"
-                        data-sort-branch="<?= e(strtolower($borrow->getBibliothequeNom())) ?>"
-                        data-sort-status="<?= e(strtolower(status_label($borrow->getStatus()))) ?>"
-                        data-sort-return="<?= e($borrow->getReturnDate()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower('#' . $borrow->getId() . ' ' . $borrow->getUserName() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-ref="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-user="<?= htmlspecialchars(strtolower($borrow->getUserName() ?: $borrow->getFullName()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-book="<?= htmlspecialchars(strtolower($borrow->getLivreTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-branch="<?= htmlspecialchars(strtolower($borrow->getBibliothequeNom()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-status="<?= htmlspecialchars(strtolower(status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-return="<?= htmlspecialchars($borrow->getReturnDate(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td>#<?= e((string) $borrow->getId()) ?></td>
+                        <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <?php if ($borrow->getUserId()): ?>
-                                <a class="table-link" href="<?= url('admin-user-view', ['id' => $borrow->getUserId()]) ?>"><?= e($borrow->getUserName() ?: $borrow->getFullName()) ?></a>
+                                <a class="table-link" href="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($borrow->getUserId())) ?>"><?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?></a>
                             <?php else: ?>
-                                <?= e($borrow->getUserName() ?: $borrow->getFullName()) ?>
+                                <?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?>
                             <?php endif; ?>
                         </td>
-                        <td><?= e($borrow->getLivreTitre()) ?></td>
+                        <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <?php if ($borrow->getBibliothequeId()): ?>
-                                <a class="table-link" href="<?= url('admin-branch-view', ['id' => $borrow->getBibliothequeId()]) ?>"><?= e($borrow->getBibliothequeNom()) ?></a>
+                                <a class="table-link" href="<?= 'admin-branch-view.php?id=' . rawurlencode((string) ($borrow->getBibliothequeId())) ?>"><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></a>
                             <?php else: ?>
-                                <?= e($borrow->getBibliothequeNom()) ?>
+                                <?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?>
                             <?php endif; ?>
                         </td>
-                        <td><?= e(format_date_fr($borrow->getBorrowDate())) ?></td>
-                        <td><?= e(format_date_fr($borrow->getReturnDate())) ?></td>
-                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= e(status_label($borrow->getStatus())) ?></span></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= htmlspecialchars(status_label($borrow->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                         <td class="table-actions">
                             <form method="post" class="inline-form">
-                                <input type="hidden" name="id" value="<?= e((string) $borrow->getId()) ?>">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="confirm">
                                 <button class="btn btn-sm btn-primary" type="submit">Confirmer</button>
                             </form>
                             <form method="post" class="inline-form">
-                                <input type="hidden" name="id" value="<?= e((string) $borrow->getId()) ?>">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="returned">
                                 <button class="btn btn-sm btn-secondary" type="submit">Retourné</button>
                             </form>
                             <form method="post" class="inline-form">
-                                <input type="hidden" name="id" value="<?= e((string) $borrow->getId()) ?>">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>">
                                 <input type="hidden" name="action" value="cancel">
                                 <button class="btn btn-sm btn-danger" type="submit">Annuler</button>
                             </form>

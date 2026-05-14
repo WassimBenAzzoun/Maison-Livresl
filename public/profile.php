@@ -20,7 +20,8 @@ $user = $userModel->findWithMembership((int) ($sessionUser['id'] ?? 0));
 
 if (!$user) {
     flash_set('danger', 'Utilisateur introuvable.');
-    redirect_page('logout');
+    header('Location: logout.php');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -60,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         flash_set('success', 'Profil mis à jour.');
-        redirect_page('profile');
+        header('Location: profile.php');
+        exit;
     }
 }
 
@@ -81,30 +83,30 @@ require __DIR__ . '/partials/header.php';
         <div class="panel">
             <h2>Mes informations</h2>
             <ul class="info-list">
-                <li><strong>Nom :</strong> <?= e($user->getFullName()) ?></li>
-                <li><strong>Email :</strong> <?= e($user->getEmail()) ?></li>
-                <li><strong>Téléphone :</strong> <?= e($user->getPhone()) ?></li>
-                <li><strong>Adresse :</strong> <?= e($user->getAddress()) ?></li>
-                <li><strong>Statut :</strong> <span class="badge <?= badge_class($user->getStatus()) ?>"><?= e(status_label($user->getStatus())) ?></span></li>
-                <li><strong>Adhésion :</strong> <?= e(membership_label($user->getMembershipType())) ?></li>
-                <li><strong>Expire le :</strong> <?= e(format_date_fr($user->getMembershipExpiresAt())) ?></li>
-                <li><strong>Payée au :</strong> <?= e($user->getMembershipBranchName() ?: '-') ?></li>
+                <li><strong>Nom :</strong> <?= htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Email :</strong> <?= htmlspecialchars($user->getEmail(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Téléphone :</strong> <?= htmlspecialchars($user->getPhone(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Adresse :</strong> <?= htmlspecialchars($user->getAddress(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Statut :</strong> <span class="badge <?= badge_class($user->getStatus()) ?>"><?= htmlspecialchars(status_label($user->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></li>
+                <li><strong>Adhésion :</strong> <?= htmlspecialchars(membership_label($user->getMembershipType()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Expire le :</strong> <?= htmlspecialchars(format_date_fr($user->getMembershipExpiresAt()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Payée au :</strong> <?= htmlspecialchars($user->getMembershipBranchName() ?: '-', ENT_QUOTES, 'UTF-8') ?></li>
             </ul>
         </div>
 
         <form class="panel form-stack" method="post" data-profile-form>
             <h2>Modifier le profil</h2>
             <label>Nom complet
-                <input class="form-control" type="text" name="full_name" value="<?= e($user->getFullName()) ?>" required>
+                <input class="form-control" type="text" name="full_name" value="<?= htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Email
-                <input class="form-control" type="email" name="email" value="<?= e($user->getEmail()) ?>" required>
+                <input class="form-control" type="email" name="email" value="<?= htmlspecialchars($user->getEmail(), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Téléphone
-                <input class="form-control" type="text" name="phone" value="<?= e($user->getPhone()) ?>" required>
+                <input class="form-control" type="text" name="phone" value="<?= htmlspecialchars($user->getPhone(), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Adresse
-                <input class="form-control" type="text" name="address" value="<?= e($user->getAddress()) ?>">
+                <input class="form-control" type="text" name="address" value="<?= htmlspecialchars($user->getAddress(), ENT_QUOTES, 'UTF-8') ?>">
             </label>
             <label>Nouveau mot de passe
                 <input class="form-control" type="password" name="password" placeholder="Laisser vide pour ne pas changer">

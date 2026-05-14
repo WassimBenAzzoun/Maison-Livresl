@@ -23,11 +23,24 @@ require __DIR__ . '/partials/header.php';
     <div class="section-head">
         <h1>Catalogue</h1>
         <p>Créer, modifier et supprimer les ouvrages proposés.</p>
-        <a class="btn btn-primary" href="<?= url('admin-book-form') ?>">Ajouter un ouvrage</a>
+        <a class="btn btn-primary" href="<?= 'admin-book-form.php' ?>">Ajouter un ouvrage</a>
+    </div>
+
+    <div class="table-tools" data-table-tools data-table-target="adminBooksTable">
+        <input class="form-control" type="search" placeholder="Rechercher un livre" data-table-search>
+        <select class="form-control" data-table-sort>
+            <option value="">Trier par défaut</option>
+            <option value="title:asc">Titre A-Z</option>
+            <option value="title:desc">Titre Z-A</option>
+            <option value="author:asc">Auteur A-Z</option>
+            <option value="category:asc">Catégorie A-Z</option>
+            <option value="total:desc">Plus d'exemplaires</option>
+            <option value="available:desc">Plus disponibles</option>
+        </select>
     </div>
 
     <div class="table-responsive">
-        <table class="data-table">
+        <table class="data-table" id="adminBooksTable">
             <thead>
                 <tr>
                     <th>Titre</th>
@@ -41,16 +54,23 @@ require __DIR__ . '/partials/header.php';
             </thead>
             <tbody>
                 <?php foreach ($livres as $livre): ?>
-                    <tr>
-                        <td><?= e($livre->getTitre()) ?></td>
-                        <td><?= e($livre->getAuteur()) ?></td>
-                        <td><?= e($livre->getCategorie()) ?></td>
-                        <td><?= e((string) $livre->getTotalExemplaires()) ?></td>
-                        <td><?= e((string) $livre->getAvailableExemplaires()) ?></td>
-                        <td><?= e($livre->getBibliothequeNom() ?? '-') ?></td>
+                    <tr
+                        data-search="<?= htmlspecialchars(strtolower($livre->getTitre() . ' ' . $livre->getAuteur() . ' ' . $livre->getCategorie() . ' ' . ($livre->getBibliothequeNom() ?? '-')), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-title="<?= htmlspecialchars(strtolower($livre->getTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-author="<?= htmlspecialchars(strtolower($livre->getAuteur()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-category="<?= htmlspecialchars(strtolower($livre->getCategorie()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-total="<?= htmlspecialchars((string) $livre->getTotalExemplaires(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-available="<?= htmlspecialchars((string) $livre->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?>"
+                    >
+                        <td><?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $livre->getTotalExemplaires(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $livre->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($livre->getBibliothequeNom() ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
                         <td class="table-actions">
-                            <a class="btn btn-sm btn-secondary" href="<?= url('admin-book-form', ['id' => $livre->getId()]) ?>">Modifier</a>
-                            <a class="btn btn-sm btn-danger" href="<?= url('admin-book-delete', ['id' => $livre->getId()]) ?>" onclick="return confirm('Supprimer ce livre ?');">Supprimer</a>
+                            <a class="btn btn-sm btn-secondary" href="<?= 'admin-book-form.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Modifier</a>
+                            <a class="btn btn-sm btn-danger" href="<?= 'admin-book-delete.php?id=' . rawurlencode((string) ($livre->getId())) ?>" onclick="return confirm('Supprimer ce livre ?');">Supprimer</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

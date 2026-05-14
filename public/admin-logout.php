@@ -9,4 +9,5 @@ require_once __DIR__ . '/../app/core/helpers.php';
 
 unset($_SESSION['user'], $_SESSION['admin']);
 flash_set('success', 'Administrateur déconnecté.');
-redirect_page('home');
+header('Location: home.php');
+exit;

@@ -40,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         flash_set('success', 'Compte créé avec succès. Vous pouvez vous connecter.');
-        redirect_page('login');
+        header('Location: login.php');
+            exit;
     }
 }
 
@@ -54,16 +55,16 @@ require __DIR__ . '/partials/header.php';
         <h1>Créer un accès</h1>
         <p>Rejoignez Maison des Livres pour réserver et gérer vos lectures.</p>
         <label>Nom complet
-            <input class="form-control" type="text" name="full_name" value="<?= e(old('full_name')) ?>" required>
+            <input class="form-control" type="text" name="full_name" value="<?= htmlspecialchars($_POST['full_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </label>
         <label>Email
-            <input class="form-control" type="email" name="email" value="<?= e(old('email')) ?>" required>
+            <input class="form-control" type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </label>
         <label>Téléphone
-            <input class="form-control" type="text" name="phone" value="<?= e(old('phone')) ?>" required>
+            <input class="form-control" type="text" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </label>
         <label>Adresse
-            <input class="form-control" type="text" name="address" value="<?= e(old('address')) ?>">
+            <input class="form-control" type="text" name="address" value="<?= htmlspecialchars($_POST['address'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
         </label>
         <label>Mot de passe
             <input class="form-control" type="password" name="password" required>
@@ -72,7 +73,7 @@ require __DIR__ . '/partials/header.php';
             <input class="form-control" type="password" name="password_confirm" required>
         </label>
         <button class="btn btn-primary" type="submit">Créer mon accès</button>
-        <p class="muted">Déjà inscrit ? <a href="<?= url('login') ?>">Accéder à mon espace</a></p>
+        <p class="muted">Déjà inscrit ? <a href="<?= 'login.php' ?>">Accéder à mon espace</a></p>
     </form>
 </section>
 

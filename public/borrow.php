@@ -24,18 +24,21 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $livre = $livreModel->find($id);
 if (!$livre) {
     flash_set('danger', 'Livre introuvable.');
-    redirect_page('books');
+    header('Location: books.php');
+    exit;
 }
 
 $userRecord = $userModel->findWithMembership((int) ($sessionUser['id'] ?? 0));
 if (!$userRecord) {
     flash_set('danger', 'Utilisateur introuvable.');
-    redirect_page('logout');
+    header('Location: logout.php');
+    exit;
 }
 
 if (!$userRecord->hasActiveMembership()) {
     flash_set('warning', 'Une adhésion valide est requise avant de pouvoir emprunter.');
-    redirect_page('profile');
+    header('Location: profile.php');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -76,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $livreModel->decrementStock($bibliothequeId, (int) $livre->getId());
 
         flash_set('success', 'Votre demande d\'emprunt a été enregistrée.');
-        redirect_page('confirmation', ['id' => $empruntId]);
+        header('Location: confirmation.php?id=' . rawurlencode((string) $empruntId));
+        exit;
     }
 }
 
@@ -95,10 +99,10 @@ require __DIR__ . '/partials/header.php';
 
     <div class="split-layout">
         <div class="panel">
-            <img src="<?= e($livre->getCouverture() ?: 'assets/images/book-placeholder.svg') ?>" alt="<?= e($livre->getTitre()) ?>" class="book-cover">
-            <h2><?= e($livre->getTitre()) ?></h2>
-            <p><?= e($livre->getAuteur()) ?> · <?= e($livre->getCategorie()) ?></p>
-            <p class="muted"><?= e((string) $livre->getAvailableExemplaires()) ?> exemplaire(s) disponible(s) dans toutes les bibliothèques</p>
+            <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
+            <h2><?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?></h2>
+            <p><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></p>
+            <p class="muted"><?= htmlspecialchars((string) $livre->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?> exemplaire(s) disponible(s) dans toutes les bibliothèques</p>
             <div class="table-responsive mt-24">
                 <table class="data-table">
                     <thead>
@@ -111,9 +115,9 @@ require __DIR__ . '/partials/header.php';
                     <tbody>
                         <?php foreach ($stocks as $stock): ?>
                             <tr>
-                                <td><?= e($stock['bibliotheque_nom'] ?? '-') ?></td>
-                                <td><?= e((string) ($stock['available_exemplaires'] ?? 0)) ?></td>
-                                <td><?= e((string) ($stock['total_exemplaires'] ?? 0)) ?></td>
+                                <td><?= htmlspecialchars($stock['bibliotheque_nom'] ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars((string) ($stock['available_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars((string) ($stock['total_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -121,7 +125,7 @@ require __DIR__ . '/partials/header.php';
             </div>
             <?php if (!empty($membership)): ?>
                 <div class="alert alert-info">
-                    <strong>Adhésion :</strong> <?= e(membership_label($membership->getMembershipType())) ?> jusqu'au <?= e(format_date_fr($membership->getMembershipExpiresAt())) ?>.
+                    <strong>Adhésion :</strong> <?= htmlspecialchars(membership_label($membership->getMembershipType()), ENT_QUOTES, 'UTF-8') ?> jusqu'au <?= htmlspecialchars(format_date_fr($membership->getMembershipExpiresAt()), ENT_QUOTES, 'UTF-8') ?>.
                 </div>
             <?php endif; ?>
         </div>
@@ -132,21 +136,21 @@ require __DIR__ . '/partials/header.php';
                     <option value="">Choisir une bibliothèque</option>
                     <?php foreach ($stocks as $stock): ?>
                         <?php if ((int) ($stock['available_exemplaires'] ?? 0) > 0): ?>
-                            <option value="<?= e((string) $stock['bibliotheque_id']) ?>">
-                                <?= e($stock['bibliotheque_nom'] ?? '-') ?> (<?= e((string) ($stock['available_exemplaires'] ?? 0)) ?> dispo)
+                            <option value="<?= htmlspecialchars((string) $stock['bibliotheque_id'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($stock['bibliotheque_nom'] ?? '-', ENT_QUOTES, 'UTF-8') ?> (<?= htmlspecialchars((string) ($stock['available_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?> dispo)
                             </option>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </label>
             <label>Nom complet
-                <input class="form-control" type="text" name="full_name" value="<?= e(old('full_name', $user->getFullName() ?? '')) ?>" required>
+                <input class="form-control" type="text" name="full_name" value="<?= htmlspecialchars($_POST['full_name'] ?? ($user->getFullName() ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Email
-                <input class="form-control" type="email" name="email" value="<?= e(old('email', $user->getEmail() ?? '')) ?>" required>
+                <input class="form-control" type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? ($user->getEmail() ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Téléphone
-                <input class="form-control" type="text" name="phone" value="<?= e(old('phone', $user->getPhone() ?? '')) ?>" required>
+                <input class="form-control" type="text" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? ($user->getPhone() ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
             <label>Date d'emprunt
                 <input class="form-control" type="date" name="borrow_date" data-borrow-start required>

@@ -19,7 +19,8 @@ $userModel = new User();
 $user = $userModel->findWithMembership($id);
 if (!$user) {
     flash_set('danger', 'Utilisateur introuvable.');
-    redirect_page('admin-users');
+    header('Location: admin-users.php');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'membership_save') {
@@ -53,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'membe
         flash_set('success', 'Adhésion mise à jour.');
     }
 
-    redirect_page('admin-user-view', ['id' => $id]);
+    header('Location: admin-user-view.php?id=' . rawurlencode((string) $id));
+    exit;
 }
 
 $empruntModel = new Emprunt();
@@ -74,26 +76,26 @@ require __DIR__ . '/partials/header.php';
     <div class="split-layout">
         <div class="panel">
             <div class="panel-head">
-                <h2><?= e($user->getFullName()) ?></h2>
-                <span class="badge <?= badge_class($user->getStatus()) ?>"><?= e(status_label($user->getStatus())) ?></span>
+                <h2><?= htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8') ?></h2>
+                <span class="badge <?= badge_class($user->getStatus()) ?>"><?= htmlspecialchars(status_label($user->getStatus()), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <ul class="info-list">
-                <li><strong>Email :</strong> <?= e($user->getEmail()) ?></li>
-                <li><strong>Téléphone :</strong> <?= e($user->getPhone()) ?></li>
-                <li><strong>Adresse :</strong> <?= e($user->getAddress()) ?></li>
-                <li><strong>Rôle :</strong> <?= e(role_label($user->getRole())) ?></li>
-                <li><strong>Adhésion :</strong> <?= e(membership_label($user->getMembershipType())) ?></li>
-                <li><strong>Date de début :</strong> <?= e(format_date_fr($user->getMembershipPaidAt())) ?></li>
-                <li><strong>Date de fin :</strong> <?= e(format_date_fr($user->getMembershipExpiresAt())) ?></li>
-                <li><strong>Point de service :</strong> <?= e($user->getMembershipBranchName() ?: '-') ?></li>
+                <li><strong>Email :</strong> <?= htmlspecialchars($user->getEmail(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Téléphone :</strong> <?= htmlspecialchars($user->getPhone(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Adresse :</strong> <?= htmlspecialchars($user->getAddress(), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Rôle :</strong> <?= htmlspecialchars(role_label($user->getRole()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Adhésion :</strong> <?= htmlspecialchars(membership_label($user->getMembershipType()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Date de début :</strong> <?= htmlspecialchars(format_date_fr($user->getMembershipPaidAt()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Date de fin :</strong> <?= htmlspecialchars(format_date_fr($user->getMembershipExpiresAt()), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Point de service :</strong> <?= htmlspecialchars($user->getMembershipBranchName() ?: '-', ENT_QUOTES, 'UTF-8') ?></li>
             </ul>
         </div>
 
         <div class="panel">
             <h2>Résumé</h2>
             <ul class="info-list">
-                <li><strong>Emprunts en cours :</strong> <?= e((string) count($currentBorrowings)) ?></li>
-                <li><strong>Emprunts passés :</strong> <?= e((string) count($previousBorrowings)) ?></li>
+                <li><strong>Emprunts en cours :</strong> <?= htmlspecialchars((string) count($currentBorrowings), ENT_QUOTES, 'UTF-8') ?></li>
+                <li><strong>Emprunts passés :</strong> <?= htmlspecialchars((string) count($previousBorrowings), ENT_QUOTES, 'UTF-8') ?></li>
             </ul>
         </div>
     </div>
@@ -105,7 +107,7 @@ require __DIR__ . '/partials/header.php';
         <p>Attribuez une formule mensuelle ou annuelle et fixez la date d'expiration.</p>
     </div>
 
-    <form class="panel form-stack" method="post" action="<?= url('admin-user-view', ['id' => $user->getId()]) ?>" data-membership-form>
+    <form class="panel form-stack" method="post" action="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($user->getId())) ?>" data-membership-form>
         <input type="hidden" name="action" value="membership_save">
         <label>Formule
             <select class="form-control" name="membership_type" required data-membership-type>
@@ -115,17 +117,17 @@ require __DIR__ . '/partials/header.php';
             </select>
         </label>
         <label>Date de début
-            <input class="form-control" type="date" name="membership_paid_at" value="<?= e($user->getMembershipPaidAt() ?? '') ?>" data-membership-start>
+            <input class="form-control" type="date" name="membership_paid_at" value="<?= htmlspecialchars($user->getMembershipPaidAt() ?? '', ENT_QUOTES, 'UTF-8') ?>" data-membership-start>
         </label>
         <label>Date de fin
-            <input class="form-control" type="date" name="membership_expires_at" value="<?= e($user->getMembershipExpiresAt() ?? '') ?>" data-membership-end>
+            <input class="form-control" type="date" name="membership_expires_at" value="<?= htmlspecialchars($user->getMembershipExpiresAt() ?? '', ENT_QUOTES, 'UTF-8') ?>" data-membership-end>
         </label>
         <label>Point de service de paiement
             <select class="form-control" name="membership_branch_id">
                 <option value="">Choisir un point de service</option>
                 <?php foreach ($branches as $branch): ?>
-                    <option value="<?= e((string) $branch->getId()) ?>" <?= (int) $user->getMembershipBranchId() === (int) $branch->getId() ? 'selected' : '' ?>>
-                        <?= e($branch->getNom()) ?>
+                    <option value="<?= htmlspecialchars((string) $branch->getId(), ENT_QUOTES, 'UTF-8') ?>" <?= (int) $user->getMembershipBranchId() === (int) $branch->getId() ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($branch->getNom(), ENT_QUOTES, 'UTF-8') ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -165,18 +167,18 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($currentBorrowings as $borrow): ?>
                     <tr
-                        data-search="<?= e(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus()))) ?>"
-                        data-sort-ref="<?= e((string) $borrow->getId()) ?>"
-                        data-sort-book="<?= e(strtolower($borrow->getLivreTitre())) ?>"
-                        data-sort-branch="<?= e(strtolower($borrow->getBibliothequeNom())) ?>"
-                        data-sort-return="<?= e($borrow->getReturnDate()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-ref="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-book="<?= htmlspecialchars(strtolower($borrow->getLivreTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-branch="<?= htmlspecialchars(strtolower($borrow->getBibliothequeNom()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-return="<?= htmlspecialchars($borrow->getReturnDate(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td>#<?= e((string) $borrow->getId()) ?></td>
-                        <td><?= e($borrow->getLivreTitre()) ?></td>
-                        <td><?= e($borrow->getBibliothequeNom()) ?></td>
-                        <td><?= e(format_date_fr($borrow->getBorrowDate())) ?></td>
-                        <td><?= e(format_date_fr($borrow->getReturnDate())) ?></td>
-                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= e(status_label($borrow->getStatus())) ?></span></td>
+                        <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= htmlspecialchars(status_label($borrow->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -215,18 +217,18 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($previousBorrowings as $borrow): ?>
                     <tr
-                        data-search="<?= e(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus()))) ?>"
-                        data-sort-ref="<?= e((string) $borrow->getId()) ?>"
-                        data-sort-book="<?= e(strtolower($borrow->getLivreTitre())) ?>"
-                        data-sort-branch="<?= e(strtolower($borrow->getBibliothequeNom())) ?>"
-                        data-sort-return="<?= e($borrow->getReturnDate()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-ref="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-book="<?= htmlspecialchars(strtolower($borrow->getLivreTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-branch="<?= htmlspecialchars(strtolower($borrow->getBibliothequeNom()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-return="<?= htmlspecialchars($borrow->getReturnDate(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td>#<?= e((string) $borrow->getId()) ?></td>
-                        <td><?= e($borrow->getLivreTitre()) ?></td>
-                        <td><?= e($borrow->getBibliothequeNom()) ?></td>
-                        <td><?= e(format_date_fr($borrow->getBorrowDate())) ?></td>
-                        <td><?= e(format_date_fr($borrow->getReturnDate())) ?></td>
-                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= e(status_label($borrow->getStatus())) ?></span></td>
+                        <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= htmlspecialchars(status_label($borrow->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

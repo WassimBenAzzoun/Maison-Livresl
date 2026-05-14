@@ -35,8 +35,8 @@ require __DIR__ . '/partials/header.php';
         <select class="form-control" data-filter-branch>
             <option value="">Toutes les bibliothèques</option>
             <?php foreach ($branches as $branch): ?>
-                <option value="<?= e((string) $branch->getId()) ?>" <?= (int) $selectedBranchId === (int) $branch->getId() ? 'selected' : '' ?>>
-                    <?= e($branch->getNom()) ?>
+                <option value="<?= htmlspecialchars((string) $branch->getId(), ENT_QUOTES, 'UTF-8') ?>" <?= (int) $selectedBranchId === (int) $branch->getId() ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($branch->getNom(), ENT_QUOTES, 'UTF-8') ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -65,27 +65,27 @@ require __DIR__ . '/partials/header.php';
             <article
                 class="card book-card"
                 data-book-card
-                data-title="<?= e(strtolower($livre->getTitre())) ?>"
-                data-author="<?= e(strtolower($livre->getAuteur())) ?>"
-                data-category="<?= e(strtolower($livre->getCategorie())) ?>"
-                data-branch="<?= e(implode(',', $livre->getBibliothequeIds())) ?>"
-                data-branch-name="<?= e(strtolower($livre->getBibliothequeNom() ?? '')) ?>"
+                data-title="<?= htmlspecialchars(strtolower($livre->getTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                data-author="<?= htmlspecialchars(strtolower($livre->getAuteur()), ENT_QUOTES, 'UTF-8') ?>"
+                data-category="<?= htmlspecialchars(strtolower($livre->getCategorie()), ENT_QUOTES, 'UTF-8') ?>"
+                data-branch="<?= htmlspecialchars(implode(',', $livre->getBibliothequeIds()), ENT_QUOTES, 'UTF-8') ?>"
+                data-branch-name="<?= htmlspecialchars(strtolower($livre->getBibliothequeNom() ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                 data-availability="<?= $available ? 'available' : 'unavailable' ?>"
             >
-                <img src="<?= e($livre->getCouverture() ?: 'assets/images/book-placeholder.svg') ?>" alt="<?= e($livre->getTitre()) ?>" class="book-cover">
+                <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
                 <div class="card-body">
                     <div class="card-headline">
-                        <span class="tag"><?= e($livre->getCategorie()) ?></span>
+                        <span class="tag"><?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></span>
                         <span class="badge <?= $available ? 'badge-success' : 'badge-danger' ?>">
                             <?= $available ? 'Disponible' : 'Épuisé' ?>
                         </span>
                     </div>
-                    <h3><?= e($livre->getTitre()) ?></h3>
-                    <p><?= e($livre->getAuteur()) ?></p>
-                    <p class="muted"><?= e((string) $livre->getAnneePublication()) ?> · <?= e($livre->getBibliothequeNom() ?? 'Bibliothèque non définie') ?></p>
+                    <h3><?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?></h3>
+                    <p><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="muted"><?= htmlspecialchars((string) $livre->getAnneePublication(), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($livre->getBibliothequeNom() ?? 'Bibliothèque non définie', ENT_QUOTES, 'UTF-8') ?></p>
                     <div class="card-actions">
-                        <a class="btn btn-secondary" href="<?= url('book', ['id' => $livre->getId()]) ?>">Détails</a>
-                        <a class="btn btn-primary" href="<?= url('borrow', ['id' => $livre->getId()]) ?>">Emprunter</a>
+                        <a class="btn btn-secondary" href="<?= 'book.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Détails</a>
+                        <a class="btn btn-primary" href="<?= 'borrow.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Emprunter</a>
                     </div>
                 </div>
             </article>

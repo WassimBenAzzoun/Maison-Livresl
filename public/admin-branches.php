@@ -23,7 +23,7 @@ require __DIR__ . '/partials/header.php';
     <div class="section-head">
         <h1>Points de service</h1>
         <p>Ajoutez ou modifiez les lieux d’accueil et leurs coordonnées.</p>
-        <a class="btn btn-primary" href="<?= url('admin-branch-form') ?>">Ajouter un point de service</a>
+        <a class="btn btn-primary" href="<?= 'admin-branch-form.php' ?>">Ajouter un point de service</a>
     </div>
 
     <div class="table-tools" data-table-tools data-table-target="branchesTable">
@@ -55,22 +55,22 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($branches as $branch): ?>
                     <tr
-                        data-search="<?= e(strtolower($branch->getNom() . ' ' . $branch->getVille() . ' ' . $branch->getAdresse() . ' ' . $branch->getTelephone())) ?>"
-                        data-sort-name="<?= e(strtolower($branch->getNom())) ?>"
-                        data-sort-city="<?= e(strtolower($branch->getVille())) ?>"
-                        data-sort-books="<?= e((string) $branch->getBookCount()) ?>"
-                        data-sort-borrowings="<?= e((string) $branch->getCurrentBorrowingsCount()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower($branch->getNom() . ' ' . $branch->getVille() . ' ' . $branch->getAdresse() . ' ' . $branch->getTelephone()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-name="<?= htmlspecialchars(strtolower($branch->getNom()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-city="<?= htmlspecialchars(strtolower($branch->getVille()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-books="<?= htmlspecialchars((string) $branch->getBookCount(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-borrowings="<?= htmlspecialchars((string) $branch->getCurrentBorrowingsCount(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td><a class="table-link" href="<?= url('admin-branch-view', ['id' => $branch->getId()]) ?>"><?= e($branch->getNom()) ?></a></td>
-                        <td><?= e($branch->getVille()) ?></td>
-                        <td><?= e($branch->getTelephone()) ?></td>
-                        <td><?= e((string) $branch->getBookCount()) ?></td>
-                        <td><?= e((string) $branch->getCurrentBorrowingsCount()) ?></td>
-                        <td><?= e((string) $branch->getLatitude()) ?></td>
-                        <td><?= e((string) $branch->getLongitude()) ?></td>
+                        <td><a class="table-link" href="<?= 'admin-branch-view.php?id=' . rawurlencode((string) ($branch->getId())) ?>"><?= htmlspecialchars($branch->getNom(), ENT_QUOTES, 'UTF-8') ?></a></td>
+                        <td><?= htmlspecialchars($branch->getVille(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($branch->getTelephone(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $branch->getBookCount(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $branch->getCurrentBorrowingsCount(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $branch->getLatitude(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string) $branch->getLongitude(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td class="table-actions">
-                            <a class="btn btn-sm btn-secondary" href="<?= url('admin-branch-form', ['id' => $branch->getId()]) ?>">Modifier</a>
-                            <a class="btn btn-sm btn-danger" href="<?= url('admin-branch-delete', ['id' => $branch->getId()]) ?>" onclick="return confirm('Supprimer cette bibliothèque ?');">Supprimer</a>
+                            <a class="btn btn-sm btn-secondary" href="<?= 'admin-branch-form.php?id=' . rawurlencode((string) ($branch->getId())) ?>">Modifier</a>
+                            <a class="btn btn-sm btn-danger" href="<?= 'admin-branch-delete.php?id=' . rawurlencode((string) ($branch->getId())) ?>" onclick="return confirm('Supprimer cette bibliothèque ?');">Supprimer</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

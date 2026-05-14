@@ -29,4 +29,5 @@ if ($target && $target->getRole() === 'admin') {
     }
 }
 
-redirect_page('admin-users');
+header('Location: admin-users.php');
+exit;

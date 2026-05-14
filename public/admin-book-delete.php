@@ -18,4 +18,5 @@ if ($id > 0) {
     flash_set('success', 'Livre supprimé.');
 }
 
-redirect_page('admin-books');
+header('Location: admin-books.php');
+exit;

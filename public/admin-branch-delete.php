@@ -18,4 +18,5 @@ if ($id > 0) {
     flash_set('success', 'Bibliothèque supprimée.');
 }
 
-redirect_page('admin-branches');
+header('Location: admin-branches.php');
+exit;

@@ -54,29 +54,29 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr
-                        data-search="<?= e(strtolower($user->getFullName() . ' ' . $user->getEmail() . ' ' . $user->getPhone() . ' ' . role_label($user->getRole()) . ' ' . membership_label($user->getMembershipType()) . ' ' . status_label($user->getStatus()))) ?>"
-                        data-sort-name="<?= e(strtolower($user->getFullName())) ?>"
-                        data-sort-email="<?= e(strtolower($user->getEmail())) ?>"
-                        data-sort-role="<?= e(strtolower(role_label($user->getRole()))) ?>"
-                        data-sort-membership="<?= e(strtolower(membership_label($user->getMembershipType()))) ?>"
-                        data-sort-status="<?= e(strtolower(status_label($user->getStatus()))) ?>"
+                        data-search="<?= htmlspecialchars(strtolower($user->getFullName() . ' ' . $user->getEmail() . ' ' . $user->getPhone() . ' ' . role_label($user->getRole()) . ' ' . membership_label($user->getMembershipType()) . ' ' . status_label($user->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-name="<?= htmlspecialchars(strtolower($user->getFullName()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-email="<?= htmlspecialchars(strtolower($user->getEmail()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-role="<?= htmlspecialchars(strtolower(role_label($user->getRole())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-membership="<?= htmlspecialchars(strtolower(membership_label($user->getMembershipType())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-status="<?= htmlspecialchars(strtolower(status_label($user->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td><a class="table-link" href="<?= url('admin-user-view', ['id' => $user->getId()]) ?>"><?= e($user->getFullName()) ?></a></td>
-                        <td><?= e($user->getEmail()) ?></td>
-                        <td><?= e($user->getPhone()) ?></td>
-                        <td><span class="badge badge-info"><?= e(role_label($user->getRole())) ?></span></td>
-                        <td><span class="badge badge-info"><?= e(membership_label($user->getMembershipType())) ?></span></td>
-                        <td><span class="badge <?= badge_class($user->getStatus()) ?>"><?= e(status_label($user->getStatus())) ?></span></td>
+                        <td><a class="table-link" href="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($user->getId())) ?>"><?= htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8') ?></a></td>
+                        <td><?= htmlspecialchars($user->getEmail(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($user->getPhone(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge badge-info"><?= htmlspecialchars(role_label($user->getRole()), ENT_QUOTES, 'UTF-8') ?></span></td>
+                        <td><span class="badge badge-info"><?= htmlspecialchars(membership_label($user->getMembershipType()), ENT_QUOTES, 'UTF-8') ?></span></td>
+                        <td><span class="badge <?= badge_class($user->getStatus()) ?>"><?= htmlspecialchars(status_label($user->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                         <td class="table-actions">
-                            <a class="btn btn-sm btn-secondary" href="<?= url('admin-user-view', ['id' => $user->getId()]) ?>">Détails</a>
+                            <a class="btn btn-sm btn-secondary" href="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($user->getId())) ?>">Détails</a>
                             <?php if ($user->getRole() !== 'admin'): ?>
-                                <form method="post" action="<?= url('admin-user-action') ?>" class="inline-form">
-                                    <input type="hidden" name="id" value="<?= e((string) $user->getId()) ?>">
+                                <form method="post" action="<?= 'admin-user-action.php' ?>" class="inline-form">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars((string) $user->getId(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="action" value="toggle">
                                     <button class="btn btn-sm btn-primary" type="submit">Activer/Désactiver</button>
                                 </form>
-                                <form method="post" action="<?= url('admin-user-action') ?>" class="inline-form" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                                    <input type="hidden" name="id" value="<?= e((string) $user->getId()) ?>">
+                                <form method="post" action="<?= 'admin-user-action.php' ?>" class="inline-form" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars((string) $user->getId(), ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="action" value="delete">
                                     <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
                                 </form>

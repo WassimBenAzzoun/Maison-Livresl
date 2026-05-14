@@ -119,7 +119,7 @@ Leaflet affiche les points de service sur une carte à partir des coordonnées s
 - requêtes préparées PDO
 - `password_hash` et `password_verify`
 - sessions PHP
-- `htmlspecialchars` via le helper `e()`
+- `htmlspecialchars` directement dans les pages
 - formulaires `POST` pour les actions sensibles
 
 ## Remarque

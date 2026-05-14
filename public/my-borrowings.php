@@ -52,19 +52,19 @@ require __DIR__ . '/partials/header.php';
             <tbody>
                 <?php foreach ($borrowings as $borrow): ?>
                     <tr
-                        data-search="<?= e(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus()))) ?>"
-                        data-sort-ref="<?= e((string) $borrow->getId()) ?>"
-                        data-sort-book="<?= e(strtolower($borrow->getLivreTitre())) ?>"
-                        data-sort-branch="<?= e(strtolower($borrow->getBibliothequeNom())) ?>"
-                        data-sort-status="<?= e(strtolower(status_label($borrow->getStatus()))) ?>"
-                        data-sort-return="<?= e($borrow->getReturnDate()) ?>"
+                        data-search="<?= htmlspecialchars(strtolower('#' . $borrow->getId() . ' ' . $borrow->getLivreTitre() . ' ' . $borrow->getBibliothequeNom() . ' ' . status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-ref="<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-book="<?= htmlspecialchars(strtolower($borrow->getLivreTitre()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-branch="<?= htmlspecialchars(strtolower($borrow->getBibliothequeNom()), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-status="<?= htmlspecialchars(strtolower(status_label($borrow->getStatus())), ENT_QUOTES, 'UTF-8') ?>"
+                        data-sort-return="<?= htmlspecialchars($borrow->getReturnDate(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td>#<?= e((string) $borrow->getId()) ?></td>
-                        <td><?= e($borrow->getLivreTitre()) ?></td>
-                        <td><?= e($borrow->getBibliothequeNom()) ?></td>
-                        <td><?= e(format_date_fr($borrow->getBorrowDate())) ?></td>
-                        <td><?= e(format_date_fr($borrow->getReturnDate())) ?></td>
-                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= e(status_label($borrow->getStatus())) ?></span></td>
+                        <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getBorrowDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(format_date_fr($borrow->getReturnDate()), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><span class="badge <?= badge_class($borrow->getStatus()) ?>"><?= htmlspecialchars(status_label($borrow->getStatus()), ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
