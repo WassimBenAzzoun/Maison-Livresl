@@ -7,11 +7,11 @@ class Database
     public static function getConnection(): PDO
     {
         if (self::$connection === null) {
-            $host = getenv('DB_HOST') ?: 'localhost';
-            $name = getenv('DB_NAME') ?: 'library_management';
-            $user = getenv('DB_USER') ?: 'root';
-            $pass = getenv('DB_PASS') ?: '';
-            $port = getenv('DB_PORT') ?: '3306';
+            $host = 'db';
+            $name = 'library_management';
+            $user = 'root';
+            $pass = 'root';
+            $port = '3306';
 
             $dsn = 'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $name . ';charset=utf8mb4';
             self::$connection = new PDO($dsn, $user, $pass, [
