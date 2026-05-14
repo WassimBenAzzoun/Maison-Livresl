@@ -9,22 +9,19 @@ define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 
 require_once APP_PATH . '/core/helpers.php';
-
-spl_autoload_register(function (string $class): void {
-    $paths = [
-        APP_PATH . '/config/' . $class . '.php',
-        APP_PATH . '/core/' . $class . '.php',
-        APP_PATH . '/models/' . $class . '.php',
-        APP_PATH . '/controllers/' . $class . '.php',
-    ];
-
-    foreach ($paths as $path) {
-        if (is_file($path)) {
-            require_once $path;
-            return;
-        }
-    }
-});
+require_once APP_PATH . '/config/Database.php';
+require_once APP_PATH . '/core/Model.php';
+require_once APP_PATH . '/core/Controller.php';
+require_once APP_PATH . '/models/Bibliotheque.php';
+require_once APP_PATH . '/models/Livre.php';
+require_once APP_PATH . '/models/Emprunt.php';
+require_once APP_PATH . '/models/User.php';
+require_once APP_PATH . '/controllers/HomeController.php';
+require_once APP_PATH . '/controllers/LivreController.php';
+require_once APP_PATH . '/controllers/EmpruntController.php';
+require_once APP_PATH . '/controllers/AuthController.php';
+require_once APP_PATH . '/controllers/UserController.php';
+require_once APP_PATH . '/controllers/AdminController.php';
 
 $page = $_GET['page'] ?? 'home';
 

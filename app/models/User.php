@@ -73,7 +73,7 @@ class User extends Model
     public function setStatus(string $status): void { $this->status = $status; }
     public function setRole(string $role): void { $this->role = $role; }
 
-    private function hydrateRow(array $row): User
+    protected function hydrateRow(array $row): User
     {
         return new User($row);
     }
@@ -81,7 +81,7 @@ class User extends Model
     public function all(): array
     {
         $rows = $this->fetchAll('SELECT * FROM users ORDER BY created_at DESC');
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function find(int $id): ?User

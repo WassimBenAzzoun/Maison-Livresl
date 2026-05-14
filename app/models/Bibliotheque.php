@@ -52,7 +52,7 @@ class Bibliotheque extends Model
     public function setLatitude(float $latitude): void { $this->latitude = $latitude; }
     public function setLongitude(float $longitude): void { $this->longitude = $longitude; }
 
-    private function hydrateRow(array $row): Bibliotheque
+    protected function hydrateRow(array $row): Bibliotheque
     {
         return new Bibliotheque($row);
     }
@@ -67,7 +67,7 @@ class Bibliotheque extends Model
              ORDER BY b.created_at DESC'
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function allWithBookCounts(): array
@@ -106,7 +106,13 @@ class Bibliotheque extends Model
             ['id' => $id]
         );
 
-        return array_map(fn ($row) => new Livre($row), $rows);
+        $items = [];
+
+        foreach ($rows as $row) {
+            $items[] = new Livre($row);
+        }
+
+        return $items;
     }
 
     public function currentBorrowingsById(int $id): array
@@ -120,7 +126,13 @@ class Bibliotheque extends Model
             ['id' => $id]
         );
 
-        return array_map(fn ($row) => new Emprunt($row), $rows);
+        $items = [];
+
+        foreach ($rows as $row) {
+            $items[] = new Emprunt($row);
+        }
+
+        return $items;
     }
 
     public function create(array $data): bool

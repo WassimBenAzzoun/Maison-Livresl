@@ -22,9 +22,21 @@ abstract class Model
         return $this->execute($sql, $params)->fetchAll();
     }
 
+    protected function hydrateRows(array $rows): array
+    {
+        $items = [];
+
+        foreach ($rows as $row) {
+            $items[] = $this->hydrateRow($row);
+        }
+
+        return $items;
+    }
+
+    abstract protected function hydrateRow(array $row): object;
+
     protected function fetchOne(string $sql, array $params = []): array|false
     {
         return $this->execute($sql, $params)->fetch();
     }
 }
-

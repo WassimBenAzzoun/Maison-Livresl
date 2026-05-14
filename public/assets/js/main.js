@@ -1,6 +1,23 @@
+const compareValues = (left, right, direction) => {
+    const factor = direction === 'desc' ? -1 : 1;
+    const leftNumber = Number(left);
+    const rightNumber = Number(right);
+
+    if (!Number.isNaN(leftNumber) && !Number.isNaN(rightNumber) && String(left).trim() !== '' && String(right).trim() !== '') {
+        return (leftNumber - rightNumber) * factor;
+    }
+
+    return String(left).localeCompare(String(right), 'fr', {
+        sensitivity: 'base',
+        numeric: true
+    }) * factor;
+};
+
 window.LibraryApp = {
+    // Used by: app/views/home.php, app/views/livres/show.php, app/views/admin/branch_view.php
     initBranchesMap(containerId, branches) {
         const container = document.getElementById(containerId);
+
         if (!container || !window.L) {
             return;
         }
@@ -9,28 +26,32 @@ window.LibraryApp = {
         const markers = [];
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         branches.forEach((branch) => {
-            const lat = Number(branch.latitude);
-            const lng = Number(branch.longitude);
+                const lat = Number(branch.latitude);
+                const lng = Number(branch.longitude);
+
             if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
                 const marker = L.marker([lat, lng]).addTo(map);
-                marker.bindPopup(`<strong>${escapeHtml(branch.nom || '')}</strong><br>${escapeHtml(branch.adresse || '')}<br>${escapeHtml(branch.ville || '')}`);
+                marker.bindPopup(`<strong>${branch.nom || ''}</strong><br>${branch.adresse || ''}<br>${branch.ville || ''}`);
                 markers.push([lat, lng]);
             }
         });
 
         if (markers.length > 0) {
             map.fitBounds(markers, { padding: [24, 24] });
-        } else {
-            map.setView([36.8, 10.1], 10);
+            return;
         }
+
+        map.setView([36.8, 10.1], 10);
     },
 
+    // Used by: app/views/livres/show.php, app/views/admin/branch_view.php
     initSingleBranchMap(containerId, branch) {
         const container = document.getElementById(containerId);
+
         if (!container || !window.L) {
             return;
         }
@@ -40,25 +61,17 @@ window.LibraryApp = {
         const map = L.map(containerId).setView([lat || 36.8, lng || 10.1], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-            L.marker([lat, lng]).addTo(map).bindPopup(`<strong>${escapeHtml(branch.nom || '')}</strong><br>${escapeHtml(branch.adresse || '')}<br>${escapeHtml(branch.ville || '')}`).openPopup();
+            L.marker([lat, lng]).addTo(map).bindPopup(`<strong>${branch.nom || ''}</strong><br>${branch.adresse || ''}<br>${branch.ville || ''}`).openPopup();
         }
-    },
+    }
 };
 
-function escapeHtml(value) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-function initBookFilters() {
+// Used by: app/views/livres/index.php
+const initBookFilters = () => {
     const titleInput = document.querySelector('[data-filter-title]');
     const authorInput = document.querySelector('[data-filter-author]');
     const categoryInput = document.querySelector('[data-filter-category]');
@@ -66,6 +79,7 @@ function initBookFilters() {
     const availabilityInput = document.querySelector('[data-filter-availability]');
     const sortSelect = document.querySelector('[data-book-sort]');
     const grid = document.querySelector('[data-books-grid]');
+    const noResults = document.querySelector('[data-no-results]');
     const cards = Array.from(document.querySelectorAll('[data-book-card]')).map((card, index) => ({
         card,
         index,
@@ -74,28 +88,12 @@ function initBookFilters() {
         category: card.dataset.category || '',
         branch: card.dataset.branch || '',
         branchName: card.dataset.branchName || '',
-        availability: card.dataset.availability || '',
+        availability: card.dataset.availability || ''
     }));
-    const noResults = document.querySelector('[data-no-results]');
 
-    if (!titleInput || cards.length === 0 || !grid) {
+    if (!titleInput || !grid || cards.length === 0) {
         return;
     }
-
-    const compareValues = (left, right, direction) => {
-        const factor = direction === 'desc' ? -1 : 1;
-        const leftNumber = Number(left);
-        const rightNumber = Number(right);
-
-        if (!Number.isNaN(leftNumber) && !Number.isNaN(rightNumber) && String(left).trim() !== '' && String(right).trim() !== '') {
-            return (leftNumber - rightNumber) * factor;
-        }
-
-        return String(left).localeCompare(String(right), 'fr', {
-            sensitivity: 'base',
-            numeric: true,
-        }) * factor;
-    };
 
     const applyFilters = () => {
         const criteria = {
@@ -103,28 +101,36 @@ function initBookFilters() {
             author: authorInput ? authorInput.value.trim().toLowerCase() : '',
             category: categoryInput ? categoryInput.value.trim().toLowerCase() : '',
             branch: branchInput ? branchInput.value.trim() : '',
-            availability: availabilityInput ? availabilityInput.value.trim() : '',
+            availability: availabilityInput ? availabilityInput.value.trim() : ''
         };
 
-        const orderedCards = cards.slice().sort((a, b) => {
-            if (!sortSelect || !sortSelect.value) {
-                return a.index - b.index;
-            }
+            const orderedCards = cards.slice().sort((a, b) => {
+                if (!sortSelect || !sortSelect.value) {
+                    return a.index - b.index;
+                }
 
-            const [field, direction = 'asc'] = sortSelect.value.split(':');
-            const left = field === 'availability'
-                ? (a.availability === 'available' ? 1 : 0)
-                : field === 'branch'
-                    ? a.branchName
-                : a[field] ?? '';
-            const right = field === 'availability'
-                ? (b.availability === 'available' ? 1 : 0)
-                : field === 'branch'
-                    ? b.branchName
-                : b[field] ?? '';
+                const [field, direction = 'asc'] = sortSelect.value.split(':');
+                const left = field === 'availability'
+                    ? (a.availability === 'available' ? '1' : '0')
+                    : field === 'branch'
+                        ? a.branchName
+                        : a[field] || '';
+                const right = field === 'availability'
+                    ? (b.availability === 'available' ? '1' : '0')
+                    : field === 'branch'
+                        ? b.branchName
+                        : b[field] || '';
 
-            return compareValues(left, right, direction);
-        });
+                if (left < right) {
+                    return direction === 'desc' ? 1 : -1;
+                }
+
+                if (left > right) {
+                    return direction === 'desc' ? -1 : 1;
+                }
+
+                return 0;
+            });
 
         const visibleCards = orderedCards.filter((item) => {
             const matchesTitle = !criteria.title || item.title.includes(criteria.title);
@@ -132,17 +138,19 @@ function initBookFilters() {
             const matchesCategory = !criteria.category || item.category.includes(criteria.category);
             const matchesBranch = !criteria.branch || item.branch === criteria.branch;
             const matchesAvailability = !criteria.availability || item.availability === criteria.availability;
+
             return matchesTitle && matchesAuthor && matchesCategory && matchesBranch && matchesAvailability;
         });
 
-        const fragment = document.createDocumentFragment();
         orderedCards.forEach((item) => {
             const visible = visibleCards.includes(item);
             item.card.classList.toggle('hidden', !visible);
-            fragment.appendChild(item.card);
+            grid.appendChild(item.card);
         });
-        grid.innerHTML = '';
-        grid.appendChild(fragment);
+
+        if (grid.innerHTML !== '') {
+            grid.innerHTML = '';
+        }
 
         if (noResults) {
             noResults.classList.toggle('hidden', visibleCards.length !== 0);
@@ -157,29 +165,10 @@ function initBookFilters() {
     });
 
     applyFilters();
-}
+};
 
-function getTableSortValue(row, field) {
-    const key = `sort${field.charAt(0).toUpperCase()}${field.slice(1)}`;
-    return row.dataset[key] ?? row.dataset[field] ?? '';
-}
-
-function compareTableValues(left, right, direction) {
-    const factor = direction === 'desc' ? -1 : 1;
-    const leftNumber = Number(left);
-    const rightNumber = Number(right);
-
-    if (!Number.isNaN(leftNumber) && !Number.isNaN(rightNumber) && String(left).trim() !== '' && String(right).trim() !== '') {
-        return (leftNumber - rightNumber) * factor;
-    }
-
-    return String(left).localeCompare(String(right), 'fr', {
-        sensitivity: 'base',
-        numeric: true,
-    }) * factor;
-}
-
-function initTableTools() {
+// Used by: app/views/admin/branch_view.php, app/views/admin/borrowings.php, app/views/admin/branches.php, app/views/admin/dashboard.php, app/views/admin/user_view.php, app/views/admin/users.php, app/views/user/borrowings.php
+const initTableTools = () => {
     document.querySelectorAll('[data-table-tools]').forEach((tools) => {
         const tableId = tools.dataset.tableTarget;
         const table = tableId ? document.getElementById(tableId) : null;
@@ -198,32 +187,41 @@ function initTableTools() {
             const term = searchInput ? searchInput.value.trim().toLowerCase() : '';
             const sortValue = sortSelect ? sortSelect.value : '';
             const [field, direction = 'asc'] = sortValue ? sortValue.split(':') : [];
-
             const ordered = originalRows.slice().sort((left, right) => {
+                let leftValue;
+                let rightValue;
+
                 if (!field) {
                     return left.index - right.index;
                 }
 
-                const leftValue = getTableSortValue(left.row, field);
-                const rightValue = getTableSortValue(right.row, field);
-                return compareTableValues(leftValue, rightValue, direction);
+                leftValue = left.row.dataset[`sort${field.charAt(0).toUpperCase()}${field.slice(1)}`] || left.row.dataset[field] || '';
+                rightValue = right.row.dataset[`sort${field.charAt(0).toUpperCase()}${field.slice(1)}`] || right.row.dataset[field] || '';
+
+                if (leftValue < rightValue) {
+                    return direction === 'desc' ? 1 : -1;
+                }
+
+                if (leftValue > rightValue) {
+                    return direction === 'desc' ? -1 : 1;
+                }
+
+                return 0;
             });
 
-            const fragment = document.createDocumentFragment();
             let visibleCount = 0;
 
+            tbody.innerHTML = '';
             ordered.forEach(({ row }) => {
                 const haystack = (row.dataset.search || row.textContent || '').toLowerCase();
                 const visible = !term || haystack.includes(term);
+
                 row.classList.toggle('hidden', !visible);
                 if (visible) {
                     visibleCount += 1;
                 }
-                fragment.appendChild(row);
+                tbody.appendChild(row);
             });
-
-            tbody.innerHTML = '';
-            tbody.appendChild(fragment);
 
             if (emptyState) {
                 emptyState.classList.toggle('hidden', visibleCount !== 0);
@@ -240,10 +238,12 @@ function initTableTools() {
 
         apply();
     });
-}
+};
 
-function initBorrowDuration() {
+// Used by: app/views/emprunts/form.php
+const initBorrowDuration = () => {
     const form = document.querySelector('[data-borrow-form]');
+
     if (!form) {
         return;
     }
@@ -267,15 +267,17 @@ function initBorrowDuration() {
 
     [startInput, endInput].forEach((input) => input.addEventListener('change', updateDuration));
     updateDuration();
-}
+};
 
-function addDuration(startValue, type) {
+const addDuration = (startValue, type) => {
     const start = new Date(`${startValue}T00:00:00`);
+
     if (Number.isNaN(start.getTime())) {
         return '';
     }
 
     const end = new Date(start);
+
     if (type === 'monthly') {
         end.setMonth(end.getMonth() + 1);
     } else if (type === 'yearly') {
@@ -287,19 +289,23 @@ function addDuration(startValue, type) {
     const year = end.getFullYear();
     const month = String(end.getMonth() + 1).padStart(2, '0');
     const day = String(end.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
 
-function formatTodayForInput() {
+    return `${year}-${month}-${day}`;
+};
+
+const formatTodayForInput = () => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
 
-function initMembershipDates(formSelector) {
+    return `${year}-${month}-${day}`;
+};
+
+// Used by: app/views/admin/user_view.php
+const initMembershipDates = (formSelector) => {
     const form = document.querySelector(formSelector);
+
     if (!form) {
         return;
     }
@@ -329,9 +335,10 @@ function initMembershipDates(formSelector) {
     typeInput.addEventListener('change', syncDates);
     startInput.addEventListener('change', syncDates);
     syncDates();
-}
+};
 
-function initValidation() {
+// Used by: app/views/admin/book_form.php, app/views/admin/branch_form.php, app/views/admin/login.php, app/views/auth/login.php, app/views/auth/register.php, app/views/emprunts/form.php, app/views/user/profile.php
+const initValidation = () => {
     document.querySelectorAll('form[data-validate]').forEach((form) => {
         form.addEventListener('submit', (event) => {
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
@@ -366,6 +373,7 @@ function initValidation() {
             if (borrowStart && borrowEnd && borrowStart.value && borrowEnd.value) {
                 const start = new Date(`${borrowStart.value}T00:00:00`);
                 const end = new Date(`${borrowEnd.value}T00:00:00`);
+
                 if (end <= start) {
                     event.preventDefault();
                     borrowEnd.focus();
@@ -374,42 +382,44 @@ function initValidation() {
             }
         });
     });
-}
+};
 
-function renderBarChart(containerId, entries, colorClass) {
+const renderBarChart = (containerId, entries, colorClass) => {
     const container = document.getElementById(containerId);
+
     if (!container) {
         return;
     }
 
-    const normalized = (entries || []).map((entry) => ({
+    const normalized = entries.map((entry) => ({
         label: entry.label || 'Sans libellé',
-        total: Number(entry.total || 0),
+        total: Number(entry.total || 0)
     }));
-
-    const maxValue = normalized.reduce((max, entry) => Math.max(max, entry.total), 0) || 1;
+    const maxValue = normalized.reduce((max, entry) => Math.max(max, entry.total), 1);
 
     container.innerHTML = '';
+
     normalized.forEach((entry) => {
         const row = document.createElement('div');
         row.className = 'bar-row';
         row.innerHTML = `
-            <div class="bar-label">${escapeHtml(entry.label)}</div>
+            <div class="bar-label">${entry.label}</div>
             <div class="bar-track"><div class="bar-fill ${colorClass || ''}" style="width: ${(entry.total / maxValue) * 100}%"></div></div>
             <div class="bar-value">${entry.total}</div>
         `;
         container.appendChild(row);
     });
-}
+};
 
-function initStatisticsCharts() {
+// Used by: app/views/admin/statistics.php
+const initStatisticsCharts = () => {
     if (!window.libraryStats) {
         return;
     }
 
     renderBarChart('categoryChart', window.libraryStats.by_category || [], 'chart-primary');
     renderBarChart('branchChart', window.libraryStats.by_branch || [], 'chart-secondary');
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     initBookFilters();

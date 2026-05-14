@@ -57,7 +57,7 @@ class Livre extends Model
     public function setAvailableExemplaires(int $available): void { $this->availableExemplaires = $available; }
     public function setBibliothequeId(?int $bibliothequeId): void { $this->bibliothequeId = $bibliothequeId; }
 
-    private function hydrateRow(array $row): Livre
+    protected function hydrateRow(array $row): Livre
     {
         return new Livre($row);
     }
@@ -82,7 +82,7 @@ class Livre extends Model
             $params
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function featured(int $limit = 3): array
@@ -95,7 +95,7 @@ class Livre extends Model
              LIMIT ' . (int) $limit
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function find(int $id): ?Livre

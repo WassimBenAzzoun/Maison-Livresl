@@ -59,7 +59,7 @@ class Emprunt extends Model
     public function getUserName(): string { return $this->userName; }
     public function getUserStatus(): string { return $this->userStatus; }
 
-    private function hydrateRow(array $row): Emprunt
+    protected function hydrateRow(array $row): Emprunt
     {
         return new Emprunt($row);
     }
@@ -103,7 +103,7 @@ class Emprunt extends Model
              ORDER BY e.created_at DESC'
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function byUser(int $userId): array
@@ -113,7 +113,7 @@ class Emprunt extends Model
             ['user_id' => $userId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function currentByUser(int $userId): array
@@ -123,7 +123,7 @@ class Emprunt extends Model
             ['user_id' => $userId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function previousByUser(int $userId): array
@@ -133,7 +133,7 @@ class Emprunt extends Model
             ['user_id' => $userId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function currentByBranch(int $branchId): array
@@ -147,7 +147,7 @@ class Emprunt extends Model
             ['branch_id' => $branchId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function previousByBranch(int $branchId): array
@@ -161,7 +161,7 @@ class Emprunt extends Model
             ['branch_id' => $branchId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function byBranch(int $branchId): array
@@ -175,7 +175,7 @@ class Emprunt extends Model
             ['branch_id' => $branchId]
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function updateStatus(int $id, string $status): bool
@@ -205,7 +205,7 @@ class Emprunt extends Model
             'SELECT * FROM emprunts ORDER BY created_at DESC LIMIT ' . (int) $limit
         );
 
-        return array_map(fn ($row) => $this->hydrateRow($row), $rows);
+        return $this->hydrateRows($rows);
     }
 
     public function countByCategory(): array
