@@ -1,3 +1,64 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Emprunt.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+
+require_admin_page();
+
+$empruntModel = new Emprunt();
+$livreModel = new Livre();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $action = $_POST['action'] ?? '';
+    $emprunt = $empruntModel->find($id);
+
+    if ($emprunt) {
+        if ($action === 'confirm' && $emprunt->getStatus() === 'pending') {
+            $livre = $livreModel->find((int) $emprunt->getLivreId());
+            $stock = $livre && $emprunt->getBibliothequeId() ? $livreModel->stockByBibliothequeAndLivre((int) $emprunt->getBibliothequeId(), (int) $emprunt->getLivreId()) : null;
+
+            if ($livre && $stock && (int) ($stock['available_exemplaires'] ?? 0) > 0) {
+                $empruntModel->updateStatus($id, 'confirmed');
+                $livreModel->decrementStock((int) $emprunt->getBibliothequeId(), (int) $emprunt->getLivreId());
+                flash_set('success', 'Emprunt confirmé.');
+            } else {
+                flash_set('warning', 'Aucun exemplaire disponible pour confirmer cet emprunt.');
+            }
+        } elseif ($action === 'cancel' && in_array($emprunt->getStatus(), ['pending', 'confirmed'], true)) {
+            if ($emprunt->getStatus() === 'confirmed' && $emprunt->getLivreId()) {
+                $livreModel->incrementStock((int) $emprunt->getBibliothequeId(), (int) $emprunt->getLivreId());
+            }
+            $empruntModel->updateStatus($id, 'cancelled');
+            flash_set('success', 'Emprunt annulé.');
+        } elseif ($action === 'returned' && $emprunt->getStatus() === 'confirmed') {
+            $empruntModel->updateStatus($id, 'returned');
+            if ($emprunt->getLivreId()) {
+                $livreModel->incrementStock((int) $emprunt->getBibliothequeId(), (int) $emprunt->getLivreId());
+            }
+            flash_set('success', 'Livre marqué comme retourné.');
+        } else {
+            flash_set('info', 'Aucune modification appliquée à cet emprunt.');
+        }
+    }
+
+    redirect_page('admin-borrowings');
+}
+
+$pageTitle = 'Maison des Livres | Gestion des emprunts';
+$activePage = 'admin-borrowings';
+$emprunts = $empruntModel->allWithRelations();
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Gestion des emprunts</h1>
@@ -84,3 +145,5 @@
         </table>
     </div>
 </section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

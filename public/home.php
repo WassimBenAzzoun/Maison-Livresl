@@ -1,3 +1,25 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+
+$pageTitle = 'Maison des Livres | Accueil';
+$activePage = 'home';
+
+$bibliotheques = (new Bibliotheque())->allWithBookCounts();
+$livres = (new Livre())->featured(3);
+
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="hero">
     <div class="hero-content">
         <span class="eyebrow">Maison des Livres</span>
@@ -70,3 +92,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

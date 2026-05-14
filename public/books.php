@@ -1,3 +1,27 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+
+$pageTitle = 'Maison des Livres | Catalogue';
+$activePage = 'books';
+
+$selectedBranchId = isset($_GET['branch_id']) ? (int) $_GET['branch_id'] : 0;
+$livreModel = new Livre();
+$livres = $selectedBranchId > 0 ? $livreModel->findByBranch($selectedBranchId) : $livreModel->all();
+$branches = (new Bibliotheque())->all();
+
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Catalogue des livres</h1>
@@ -31,6 +55,10 @@
         </select>
     </div>
 
+    <div class="hint mt-24">
+        Affichage des livres par point de service. Un même livre peut apparaître dans plusieurs bibliothèques.
+    </div>
+
     <div class="grid cards-3" data-books-grid>
         <?php foreach ($livres as $livre): ?>
             <?php $available = $livre->getAvailableExemplaires() > 0; ?>
@@ -40,7 +68,7 @@
                 data-title="<?= e(strtolower($livre->getTitre())) ?>"
                 data-author="<?= e(strtolower($livre->getAuteur())) ?>"
                 data-category="<?= e(strtolower($livre->getCategorie())) ?>"
-                data-branch="<?= e((string) $livre->getBibliothequeId()) ?>"
+                data-branch="<?= e(implode(',', $livre->getBibliothequeIds())) ?>"
                 data-branch-name="<?= e(strtolower($livre->getBibliothequeNom() ?? '')) ?>"
                 data-availability="<?= $available ? 'available' : 'unavailable' ?>"
             >
@@ -66,3 +94,5 @@
 
     <p class="no-results hidden" data-no-results>Aucun livre ne correspond à votre recherche.</p>
 </section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

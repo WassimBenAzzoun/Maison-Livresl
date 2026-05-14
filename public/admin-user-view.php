@@ -1,3 +1,70 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../app/models/Emprunt.php';
+require_once __DIR__ . '/../app/models/User.php';
+
+require_admin_page();
+
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$userModel = new User();
+$user = $userModel->findWithMembership($id);
+if (!$user) {
+    flash_set('danger', 'Utilisateur introuvable.');
+    redirect_page('admin-users');
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'membership_save') {
+    $membershipType = $_POST['membership_type'] ?? 'none';
+    $membershipPaidAt = trim($_POST['membership_paid_at'] ?? '');
+    $membershipExpiresAt = trim($_POST['membership_expires_at'] ?? '');
+    $membershipBranchId = (int) ($_POST['membership_branch_id'] ?? 0);
+
+    if (!in_array($membershipType, ['none', 'monthly', 'yearly'], true)) {
+        flash_set('warning', 'Type d\'adhésion invalide.');
+    } else {
+        if ($membershipType !== 'none') {
+            $startDate = $membershipPaidAt !== '' ? $membershipPaidAt : date('Y-m-d');
+            $start = new DateTime($startDate);
+            $end = clone $start;
+            $end->modify($membershipType === 'monthly' ? '+1 month' : '+1 year');
+            $membershipPaidAt = $start->format('Y-m-d');
+            $membershipExpiresAt = $end->format('Y-m-d');
+        } else {
+            $membershipPaidAt = null;
+            $membershipExpiresAt = null;
+        }
+
+        $userModel->updateMembership($id, [
+            'membership_type' => $membershipType,
+            'membership_paid_at' => $membershipPaidAt,
+            'membership_expires_at' => $membershipExpiresAt,
+            'membership_branch_id' => $membershipBranchId > 0 ? $membershipBranchId : null,
+        ]);
+
+        flash_set('success', 'Adhésion mise à jour.');
+    }
+
+    redirect_page('admin-user-view', ['id' => $id]);
+}
+
+$empruntModel = new Emprunt();
+$currentBorrowings = $empruntModel->currentByUser((int) $user->getId());
+$previousBorrowings = $empruntModel->previousByUser((int) $user->getId());
+$branches = (new Bibliotheque())->all();
+$pageTitle = 'Maison des Livres | Fiche utilisateur';
+$activePage = 'admin-users';
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Profil utilisateur</h1>
@@ -38,7 +105,7 @@
         <p>Attribuez une formule mensuelle ou annuelle et fixez la date d'expiration.</p>
     </div>
 
-    <form class="panel form-stack" method="post" action="<?= url('admin-user-view', ['id' => $user->getId()]) ?>" data-validate data-membership-form>
+    <form class="panel form-stack" method="post" action="<?= url('admin-user-view', ['id' => $user->getId()]) ?>" data-membership-form>
         <input type="hidden" name="action" value="membership_save">
         <label>Formule
             <select class="form-control" name="membership_type" required data-membership-type>
@@ -56,7 +123,7 @@
         <label>Point de service de paiement
             <select class="form-control" name="membership_branch_id">
                 <option value="">Choisir un point de service</option>
-                <?php foreach ((new Bibliotheque())->all() as $branch): ?>
+                <?php foreach ($branches as $branch): ?>
                     <option value="<?= e((string) $branch->getId()) ?>" <?= (int) $user->getMembershipBranchId() === (int) $branch->getId() ? 'selected' : '' ?>>
                         <?= e($branch->getNom()) ?>
                     </option>
@@ -166,3 +233,5 @@
         </table>
     </div>
 </section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

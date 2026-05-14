@@ -1,3 +1,24 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+
+require_admin_page();
+
+$pageTitle = 'Maison des Livres | Gestion des livres';
+$activePage = 'admin-books';
+$livres = (new Livre())->all();
+
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Catalogue</h1>
@@ -12,8 +33,9 @@
                     <th>Titre</th>
                     <th>Auteur</th>
                     <th>Catégorie</th>
+                    <th>Total</th>
                     <th>Disponibles</th>
-                    <th>Bibliothèque</th>
+                    <th>Bibliothèques</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -23,7 +45,8 @@
                         <td><?= e($livre->getTitre()) ?></td>
                         <td><?= e($livre->getAuteur()) ?></td>
                         <td><?= e($livre->getCategorie()) ?></td>
-                        <td><?= e((string) $livre->getAvailableExemplaires()) ?>/<?= e((string) $livre->getTotalExemplaires()) ?></td>
+                        <td><?= e((string) $livre->getTotalExemplaires()) ?></td>
+                        <td><?= e((string) $livre->getAvailableExemplaires()) ?></td>
                         <td><?= e($livre->getBibliothequeNom() ?? '-') ?></td>
                         <td class="table-actions">
                             <a class="btn btn-sm btn-secondary" href="<?= url('admin-book-form', ['id' => $livre->getId()]) ?>">Modifier</a>
@@ -35,3 +58,5 @@
         </table>
     </div>
 </section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

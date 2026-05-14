@@ -1,3 +1,42 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../app/models/Emprunt.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../app/models/User.php';
+
+require_admin_page();
+
+$livreModel = new Livre();
+$empruntModel = new Emprunt();
+$userModel = new User();
+$bibliothequeModel = new Bibliotheque();
+
+$pageTitle = 'Maison des Livres | Aperçu de gestion';
+$activePage = 'admin-dashboard';
+$stats = [
+    'total_books' => $livreModel->countTotal(),
+    'available_books' => $livreModel->countAvailable(),
+    'total_borrowings' => $empruntModel->countTotal(),
+    'pending_borrowings' => $empruntModel->countByStatus('pending'),
+    'confirmed_borrowings' => $empruntModel->countByStatus('confirmed'),
+    'returned_borrowings' => $empruntModel->countByStatus('returned'),
+    'total_users' => $userModel->countTotal(),
+    'total_branches' => count($bibliothequeModel->all()),
+];
+$latestBorrowings = $empruntModel->latest(5);
+
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Aperçu de gestion</h1>
@@ -62,3 +101,5 @@
         </table>
     </div>
 </section>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

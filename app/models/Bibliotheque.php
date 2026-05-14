@@ -61,10 +61,10 @@ class Bibliotheque extends Model
     {
         $rows = $this->fetchAll(
             'SELECT b.*,
-                    (SELECT COUNT(*) FROM livres l WHERE l.bibliotheque_id = b.id) AS book_count,
+                    (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-             FROM bibliotheques b
-             ORDER BY b.created_at DESC'
+              FROM bibliotheques b
+              ORDER BY b.created_at DESC'
         );
 
         return $this->hydrateRows($rows);
@@ -74,10 +74,10 @@ class Bibliotheque extends Model
     {
         return $this->fetchAll(
             'SELECT b.*,
-                    (SELECT COUNT(*) FROM livres l WHERE l.bibliotheque_id = b.id) AS book_count,
+                    (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-             FROM bibliotheques b
-             ORDER BY b.nom ASC'
+              FROM bibliotheques b
+              ORDER BY b.nom ASC'
         );
     }
 
@@ -85,11 +85,11 @@ class Bibliotheque extends Model
     {
         $row = $this->fetchOne(
             'SELECT b.*,
-                    (SELECT COUNT(*) FROM livres l WHERE l.bibliotheque_id = b.id) AS book_count,
+                    (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-             FROM bibliotheques b
-             WHERE b.id = :id
-             LIMIT 1',
+              FROM bibliotheques b
+              WHERE b.id = :id
+              LIMIT 1',
             ['id' => $id]
         );
         return $row ? $this->hydrateRow($row) : null;
@@ -97,22 +97,7 @@ class Bibliotheque extends Model
 
     public function booksById(int $id): array
     {
-        $rows = $this->fetchAll(
-            'SELECT l.*, b.nom AS bibliotheque_nom
-             FROM livres l
-             LEFT JOIN bibliotheques b ON b.id = l.bibliotheque_id
-             WHERE l.bibliotheque_id = :id
-             ORDER BY l.created_at DESC',
-            ['id' => $id]
-        );
-
-        $items = [];
-
-        foreach ($rows as $row) {
-            $items[] = new Livre($row);
-        }
-
-        return $items;
+        return (new Livre())->findByBranch($id);
     }
 
     public function currentBorrowingsById(int $id): array

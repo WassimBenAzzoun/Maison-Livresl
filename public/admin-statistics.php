@@ -1,3 +1,40 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Emprunt.php';
+require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../app/models/User.php';
+
+require_admin_page();
+
+$livreModel = new Livre();
+$empruntModel = new Emprunt();
+$userModel = new User();
+
+$stats = [
+    'total_books' => $livreModel->countTotal(),
+    'available_books' => $livreModel->countAvailable(),
+    'total_borrowings' => $empruntModel->countTotal(),
+    'pending_borrowings' => $empruntModel->countByStatus('pending'),
+    'confirmed_borrowings' => $empruntModel->countByStatus('confirmed'),
+    'returned_borrowings' => $empruntModel->countByStatus('returned'),
+    'total_users' => $userModel->countTotal(),
+    'by_category' => $empruntModel->countByCategory(),
+    'by_branch' => $empruntModel->countByBranch(),
+];
+
+$pageTitle = 'Maison des Livres | Statistiques';
+$activePage = 'admin-statistics';
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Statistiques</h1>
@@ -32,3 +69,5 @@
 <script>
 window.libraryStats = <?= json_encode($stats, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 </script>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

@@ -41,8 +41,7 @@
     </div>
 </header>
 
-<?php if (!empty($_SESSION['flash'])): ?>
-    <?php $flash = $_SESSION['flash']; unset($_SESSION['flash']); ?>
+<?php if ($flash = flash_get()): ?>
     <div class="container">
         <div class="alert alert-<?= e($flash['type']) ?>">
             <?= e($flash['message']) ?>

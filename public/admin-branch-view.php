@@ -1,3 +1,33 @@
+<?php
+declare(strict_types=1);
+
+session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
+require_once __DIR__ . '/../app/core/helpers.php';
+require_once __DIR__ . '/../app/config/Database.php';
+require_once __DIR__ . '/../app/core/Model.php';
+require_once __DIR__ . '/../app/models/Bibliotheque.php';
+
+require_admin_page();
+
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$model = new Bibliotheque();
+$branch = $model->find($id);
+
+if (!$branch) {
+    flash_set('danger', 'Point de service introuvable.');
+    redirect_page('admin-branches');
+}
+
+$books = $model->booksById($id);
+$currentBorrowings = $model->currentBorrowingsById($id);
+$pageTitle = 'Maison des Livres | Fiche point de service';
+$activePage = 'admin-branches';
+require __DIR__ . '/partials/header.php';
+?>
+
 <section class="section">
     <div class="section-head">
         <h1>Fiche point de service</h1>
@@ -143,3 +173,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

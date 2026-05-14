@@ -14,7 +14,7 @@ const compareValues = (left, right, direction) => {
 };
 
 window.LibraryApp = {
-    // Used by: app/views/home.php, app/views/livres/show.php, app/views/admin/branch_view.php
+    // Used by: public/home.php, public/book.php, public/admin-branch-view.php
     initBranchesMap(containerId, branches) {
         const container = document.getElementById(containerId);
 
@@ -48,7 +48,7 @@ window.LibraryApp = {
         map.setView([36.8, 10.1], 10);
     },
 
-    // Used by: app/views/livres/show.php, app/views/admin/branch_view.php
+    // Used by: public/book.php, public/admin-branch-view.php
     initSingleBranchMap(containerId, branch) {
         const container = document.getElementById(containerId);
 
@@ -70,7 +70,7 @@ window.LibraryApp = {
     }
 };
 
-// Used by: app/views/livres/index.php
+// Used by: public/books.php
 const initBookFilters = () => {
     const titleInput = document.querySelector('[data-filter-title]');
     const authorInput = document.querySelector('[data-filter-author]');
@@ -132,25 +132,23 @@ const initBookFilters = () => {
                 return 0;
             });
 
-        const visibleCards = orderedCards.filter((item) => {
-            const matchesTitle = !criteria.title || item.title.includes(criteria.title);
-            const matchesAuthor = !criteria.author || item.author.includes(criteria.author);
-            const matchesCategory = !criteria.category || item.category.includes(criteria.category);
-            const matchesBranch = !criteria.branch || item.branch === criteria.branch;
-            const matchesAvailability = !criteria.availability || item.availability === criteria.availability;
+            const visibleCards = orderedCards.filter((item) => {
+                const matchesTitle = !criteria.title || item.title.includes(criteria.title);
+                const matchesAuthor = !criteria.author || item.author.includes(criteria.author);
+                const matchesCategory = !criteria.category || item.category.includes(criteria.category);
+                const matchesBranch = !criteria.branch || item.branch.split(',').includes(criteria.branch);
+                const matchesAvailability = !criteria.availability || item.availability === criteria.availability;
 
-            return matchesTitle && matchesAuthor && matchesCategory && matchesBranch && matchesAvailability;
-        });
+                return matchesTitle && matchesAuthor && matchesCategory && matchesBranch && matchesAvailability;
+            });
+
+        grid.innerHTML = '';
 
         orderedCards.forEach((item) => {
             const visible = visibleCards.includes(item);
             item.card.classList.toggle('hidden', !visible);
             grid.appendChild(item.card);
         });
-
-        if (grid.innerHTML !== '') {
-            grid.innerHTML = '';
-        }
 
         if (noResults) {
             noResults.classList.toggle('hidden', visibleCards.length !== 0);
@@ -167,7 +165,7 @@ const initBookFilters = () => {
     applyFilters();
 };
 
-// Used by: app/views/admin/branch_view.php, app/views/admin/borrowings.php, app/views/admin/branches.php, app/views/admin/dashboard.php, app/views/admin/user_view.php, app/views/admin/users.php, app/views/user/borrowings.php
+// Used by: public/admin-branch-view.php, public/admin-borrowings.php, public/admin-branches.php, public/admin-dashboard.php, public/admin-user-view.php, public/admin-users.php, public/my-borrowings.php
 const initTableTools = () => {
     document.querySelectorAll('[data-table-tools]').forEach((tools) => {
         const tableId = tools.dataset.tableTarget;
@@ -240,7 +238,7 @@ const initTableTools = () => {
     });
 };
 
-// Used by: app/views/emprunts/form.php
+// Used by: public/borrow.php
 const initBorrowDuration = () => {
     const form = document.querySelector('[data-borrow-form]');
 
@@ -302,7 +300,7 @@ const formatTodayForInput = () => {
     return `${year}-${month}-${day}`;
 };
 
-// Used by: app/views/admin/user_view.php
+// Used by: public/admin-user-view.php
 const initMembershipDates = (formSelector) => {
     const form = document.querySelector(formSelector);
 
@@ -337,50 +335,187 @@ const initMembershipDates = (formSelector) => {
     syncDates();
 };
 
-// Used by: app/views/admin/book_form.php, app/views/admin/branch_form.php, app/views/admin/login.php, app/views/auth/login.php, app/views/auth/register.php, app/views/emprunts/form.php, app/views/user/profile.php
-const initValidation = () => {
-    document.querySelectorAll('form[data-validate]').forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            const requiredFields = Array.from(form.querySelectorAll('[required]'));
-            const emptyField = requiredFields.find((field) => !field.value.trim());
+const initAuthLoginValidation = () => {
+    const form = document.querySelector('form.auth-form');
 
-            if (emptyField) {
-                event.preventDefault();
-                emptyField.focus();
-                alert('Veuillez remplir tous les champs obligatoires.');
-                return;
-            }
+    if (!form || form.querySelector('input[name="password_confirm"]')) {
+        return;
+    }
 
-            const emailField = form.querySelector('input[type="email"]');
-            if (emailField && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim())) {
-                event.preventDefault();
-                emailField.focus();
-                alert('Veuillez saisir une adresse email valide.');
-                return;
-            }
+    form.addEventListener('submit', (event) => {
+        const emailField = form.querySelector('input[type="email"]');
+        const passwordField = form.querySelector('input[name="password"]');
 
-            const passwordConfirm = form.querySelector('input[name="password_confirm"]');
-            const password = form.querySelector('input[name="password"]');
-            if (passwordConfirm && password && passwordConfirm.value !== password.value) {
-                event.preventDefault();
-                passwordConfirm.focus();
-                alert('Les mots de passe doivent correspondre.');
-                return;
-            }
+        if (!emailField.value.trim() || !passwordField.value.trim()) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
 
-            const borrowStart = form.querySelector('[data-borrow-start]');
-            const borrowEnd = form.querySelector('[data-borrow-end]');
-            if (borrowStart && borrowEnd && borrowStart.value && borrowEnd.value) {
-                const start = new Date(`${borrowStart.value}T00:00:00`);
-                const end = new Date(`${borrowEnd.value}T00:00:00`);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim())) {
+            event.preventDefault();
+            emailField.focus();
+            alert('Veuillez saisir une adresse email valide.');
+        }
+    });
+};
 
-                if (end <= start) {
-                    event.preventDefault();
-                    borrowEnd.focus();
-                    alert('La date de retour doit être postérieure à la date d\'emprunt.');
-                }
-            }
-        });
+const initRegisterValidation = () => {
+    const form = document.querySelector('form.auth-form');
+
+    if (!form || !form.querySelector('input[name="password_confirm"]')) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const fullName = form.querySelector('input[name="full_name"]');
+        const emailField = form.querySelector('input[name="email"]');
+        const phoneField = form.querySelector('input[name="phone"]');
+        const password = form.querySelector('input[name="password"]');
+        const passwordConfirm = form.querySelector('input[name="password_confirm"]');
+
+        if (!fullName.value.trim() || !emailField.value.trim() || !phoneField.value.trim() || !password.value.trim() || !passwordConfirm.value.trim()) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim())) {
+            event.preventDefault();
+            emailField.focus();
+            alert('Veuillez saisir une adresse email valide.');
+            return;
+        }
+
+        if (passwordConfirm.value !== password.value) {
+            event.preventDefault();
+            passwordConfirm.focus();
+            alert('Les mots de passe doivent correspondre.');
+        }
+    });
+};
+
+const initProfileValidation = () => {
+    const form = document.querySelector('[data-profile-form]');
+
+    if (!form || form.querySelector('[data-membership-type]') || form.querySelector('[data-borrow-start]')) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const fullName = form.querySelector('input[name="full_name"]');
+        const emailField = form.querySelector('input[name="email"]');
+        const phoneField = form.querySelector('input[name="phone"]');
+
+        if (!fullName.value.trim() || !emailField.value.trim() || !phoneField.value.trim()) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim())) {
+            event.preventDefault();
+            emailField.focus();
+            alert('Veuillez saisir une adresse email valide.');
+        }
+    });
+};
+
+const initBranchFormValidation = () => {
+    const form = document.querySelector('[data-branch-form]');
+
+    if (!form || !form.querySelector('input[name="latitude"]')) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const nom = form.querySelector('input[name="nom"]');
+        const adresse = form.querySelector('input[name="adresse"]');
+        const ville = form.querySelector('input[name="ville"]');
+        const latitude = form.querySelector('input[name="latitude"]');
+        const longitude = form.querySelector('input[name="longitude"]');
+
+        if (!nom.value.trim() || !adresse.value.trim() || !ville.value.trim() || !latitude.value.trim() || !longitude.value.trim()) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+        }
+    });
+};
+
+const initBookFormValidation = () => {
+    const form = document.querySelector('form[enctype="multipart/form-data"]');
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const titre = form.querySelector('input[name="titre"]');
+        const auteur = form.querySelector('input[name="auteur"]');
+        const categorie = form.querySelector('input[name="categorie"]');
+
+        if (!titre.value.trim() || !auteur.value.trim() || !categorie.value.trim()) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+        }
+    });
+};
+
+const initBorrowFormValidation = () => {
+    const form = document.querySelector('[data-borrow-form]');
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const bibliotheque = form.querySelector('select[name="bibliotheque_id"]');
+        const fullName = form.querySelector('input[name="full_name"]');
+        const emailField = form.querySelector('input[name="email"]');
+        const phoneField = form.querySelector('input[name="phone"]');
+        const borrowStart = form.querySelector('[data-borrow-start]');
+        const borrowEnd = form.querySelector('[data-borrow-end]');
+
+        if (!bibliotheque.value || !fullName.value.trim() || !emailField.value.trim() || !phoneField.value.trim() || !borrowStart.value || !borrowEnd.value) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim())) {
+            event.preventDefault();
+            emailField.focus();
+            alert('Veuillez saisir une adresse email valide.');
+            return;
+        }
+
+        const start = new Date(`${borrowStart.value}T00:00:00`);
+        const end = new Date(`${borrowEnd.value}T00:00:00`);
+
+        if (end <= start) {
+            event.preventDefault();
+            borrowEnd.focus();
+            alert('La date de retour doit être postérieure à la date d\'emprunt.');
+        }
+    });
+};
+
+const initMembershipFormValidation = () => {
+    const form = document.querySelector('[data-membership-form]');
+
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener('submit', (event) => {
+        const typeInput = form.querySelector('[data-membership-type]');
+        const startInput = form.querySelector('[data-membership-start]');
+        const endInput = form.querySelector('[data-membership-end]');
+
+        if (!typeInput.value || !startInput.value || !endInput.value) {
+            event.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+        }
     });
 };
 
@@ -411,7 +546,7 @@ const renderBarChart = (containerId, entries, colorClass) => {
     });
 };
 
-// Used by: app/views/admin/statistics.php
+// Used by: public/admin-statistics.php
 const initStatisticsCharts = () => {
     if (!window.libraryStats) {
         return;
@@ -426,6 +561,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initTableTools();
     initBorrowDuration();
     initMembershipDates('[data-membership-form]');
-    initValidation();
+    initAuthLoginValidation();
+    initRegisterValidation();
+    initProfileValidation();
+    initBranchFormValidation();
+    initBookFormValidation();
+    initBorrowFormValidation();
+    initMembershipFormValidation();
     initStatisticsCharts();
 });

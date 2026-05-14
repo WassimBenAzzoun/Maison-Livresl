@@ -1,76 +1,83 @@
-# Library Management PHP OOP
+# Maison des Livres
 
-Application web de gestion de bibliothèque réalisée en PHP orienté objet, MySQL/PDO, HTML/CSS et JavaScript vanilla.
+Application web simple de gestion de bibliothèque réalisée en PHP, MySQL, HTML/CSS et JavaScript vanilla.
+
+## Présentation
+
+Le projet est organisé en pages PHP indépendantes. Chaque écran possède son propre fichier dans `public/` et charge uniquement ce dont il a besoin. Cette structure est volontairement simple pour un projet étudiant et facile à présenter.
 
 ## Technologies
 
-- PHP OOP
+- PHP orienté objet pour les modèles
 - MySQL avec PDO
 - HTML5 / CSS3
-- Vanilla JavaScript
+- JavaScript vanilla
 - Leaflet.js + OpenStreetMap pour la carte
 
-La gestion des comptes repose sur une seule table `users` avec un champ `role` (`user` ou `admin`).
+Les comptes utilisent une seule table `users` avec un champ `role` (`user` ou `admin`).
 
 ## Fonctionnalités
 
-- Accueil avec présentation et carte des bibliothèques
-- Catalogue des livres avec filtres instantanés côté client
-- Fiche détaillée d’un livre avec localisation de la bibliothèque
-- Inscription, connexion, déconnexion et gestion de session
-- Emprunt d’un livre avec formulaire POST
-- Confirmation d’emprunt
-- Espace utilisateur avec profil et historique
-- Espace administrateur avec dashboard, gestion des livres, emprunts, utilisateurs, bibliothèques et statistiques
+- page d’accueil avec présentation et carte des points de service
+- catalogue des livres avec filtres côté client
+- fiche détaillée d’un livre
+- inscription, connexion, déconnexion et sessions
+- emprunt de livre avec formulaire POST
+- confirmation d’emprunt
+- espace utilisateur avec profil et emprunts
+- espace administrateur avec livres, emprunts, utilisateurs, points de service, adhésions et statistiques
 
-## Structure du projet
+## Structure simplifiée
 
 ```text
 library-management-php-oop/
 ├── public/
-│   ├── index.php
+│   ├── home.php
+│   ├── books.php
+│   ├── book.php
+│   ├── login.php
+│   ├── register.php
+│   ├── profile.php
+│   ├── borrow.php
+│   ├── confirmation.php
+│   ├── admin-dashboard.php
+│   ├── admin-books.php
+│   ├── admin-borrowings.php
+│   ├── admin-users.php
+│   ├── admin-branches.php
+│   ├── admin-statistics.php
 │   └── assets/
 ├── app/
 │   ├── config/
 │   ├── core/
-│   ├── models/
-│   ├── controllers/
-│   └── views/
+│   └── models/
 ├── database/
 │   └── db.sql
 └── README.md
 ```
 
-## Installation
+## Installation locale
 
-1. Importez `database/db.sql` dans MySQL.
-2. Ouvrez `app/config/Database.php` et vérifiez les identifiants MySQL :
-   - base de données : `library_management`
-   - utilisateur : `root`
-   - mot de passe : vide par défaut
-3. Configurez votre serveur local pour pointer vers le dossier `public/`.
-4. Lancez le site avec :
+1. Importer `database/db.sql` dans MySQL.
+2. Vérifier les identifiants de base de données dans `app/config/Database.php`.
+3. Lancer le serveur local en pointant vers le dossier `public/`.
+4. Ouvrir directement les pages du projet, par exemple :
 
 ```text
-http://localhost/library-management-php-oop/public/index.php
+http://localhost:8050/home.php
 ```
 
 ## Avec Docker
 
-Lancez la stack complète :
+Lancer la stack :
 
 ```text
 docker compose up -d --build
 ```
 
-- application PHP : `http://localhost:8090`
+- application web : `http://localhost:8050`
 - phpMyAdmin : `http://localhost:8091`
-- base MySQL : `localhost:3306`
-
-Les identifiants Docker sont :
-
-- MySQL root : `root` / `root`
-- Base : `library_management`
+- MySQL : `localhost:3308`
 
 ## Comptes de démonstration
 
@@ -79,41 +86,33 @@ Les identifiants Docker sont :
 - Email : `admin@bibliotheque.local`
 - Mot de passe : `admin123`
 
-Le compte administrateur est stocké dans la table `users` avec le rôle `admin`.
-
-### Utilisateur de test
+### Utilisateur
 
 - Email : `marie.dupont@example.com`
 - Mot de passe : `user123`
 
-## OOP et MVC léger
+## Organisation du code
 
-- `Model.php` fournit la classe parent pour toutes les classes de données.
-- `Controller.php` fournit la classe parent pour les contrôleurs.
-- Chaque entité a sa propre classe : `Livre`, `Emprunt`, `Bibliotheque`, `User`.
-- Les contrôleurs récupèrent les données depuis les modèles puis les transmettent aux vues.
-- Les vues ne font qu’afficher les données.
-- Le routage est simple et repose sur `public/index.php?page=...`.
+- `app/core/Model.php` fournit la classe parente des modèles.
+- `app/core/helpers.php` contient les fonctions utilitaires partagées.
+- Chaque entité a sa propre classe dans `app/models/`.
+- Les pages PHP dans `public/` affichent elles-mêmes le HTML et appellent les modèles directement.
+- `public/index.php` sert seulement de redirection vers `home.php`.
 
-## Utilisation de JavaScript
+## JavaScript
 
-Le site utilise uniquement du JavaScript vanilla pour :
+Le JavaScript vanilla sert à :
 
-- filtrer les livres sans rechargement de page
+- filtrer les livres sans rechargement
 - calculer la durée d’un emprunt
-- valider les formulaires côté client
-- afficher les statistiques sous forme de barres
+- remplir automatiquement les dates d’adhésion
+- afficher les statistiques simples
 
 Les données PHP sont injectées dans JavaScript avec `json_encode`.
 
-## Utilisation de Leaflet
+## Carte
 
-Leaflet est utilisé uniquement pour afficher les bibliothèques sur une carte.
-
-- les coordonnées latitude/longitude sont stockées en MySQL
-- PHP charge les bibliothèques
-- les données sont injectées dans JavaScript avec `json_encode`
-- Leaflet + OpenStreetMap affiche les marqueurs sans appeler d’API PHP
+Leaflet affiche les points de service sur une carte à partir des coordonnées stockées en base de données. PHP charge les données, puis les envoie à JavaScript pour affichage.
 
 ## Sécurité
 
@@ -125,4 +124,4 @@ Leaflet est utilisé uniquement pour afficher les bibliothèques sur une carte.
 
 ## Remarque
 
-Cette base est volontairement simple et beginner-friendly. Elle est pensée pour être lue facilement, modifiée vite et étendue module par module.
+Ce projet est volontairement simple, lisible et beginner-friendly afin de convenir à un rendu académique.

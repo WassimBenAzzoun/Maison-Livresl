@@ -16,3 +16,5 @@ Thumbs.db
 *.bak
 
 /docker/mysql-data/
+/public/assets/uploads/books/*
+!/public/assets/uploads/books/.gitkeep
