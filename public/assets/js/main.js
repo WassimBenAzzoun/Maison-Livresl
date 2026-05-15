@@ -14,7 +14,7 @@ const compareValues = (left, right, direction) => {
 };
 
 window.LibraryApp = {
-    // Used by: public/home.php, public/book.php, public/admin-branch-view.php
+   
     initBranchesMap(containerId, branches) {
         const container = document.getElementById(containerId);
 
@@ -48,7 +48,7 @@ window.LibraryApp = {
         map.setView([36.8, 10.1], 10);
     },
 
-    // Used by: public/book.php, public/admin-branch-view.php
+   
     initSingleBranchMap(containerId, branch) {
         const container = document.getElementById(containerId);
 
@@ -70,7 +70,6 @@ window.LibraryApp = {
     }
 };
 
-// Used by: public/books.php
 const initBookFilters = () => {
     const titleInput = document.querySelector('[data-filter-title]');
     const authorInput = document.querySelector('[data-filter-author]');
@@ -165,7 +164,7 @@ const initBookFilters = () => {
     applyFilters();
 };
 
-// Used by: public/admin-branch-view.php, public/admin-borrowings.php, public/admin-branches.php, public/admin-dashboard.php, public/admin-user-view.php, public/admin-users.php, public/my-borrowings.php
+
 const initTableTools = () => {
     document.querySelectorAll('[data-table-tools]').forEach((tools) => {
         const tableId = tools.dataset.tableTarget;
@@ -238,7 +237,7 @@ const initTableTools = () => {
     });
 };
 
-// Used by: public/borrow.php
+
 const initBorrowDuration = () => {
     const form = document.querySelector('[data-borrow-form]');
 
@@ -300,7 +299,7 @@ const formatTodayForInput = () => {
     return `${year}-${month}-${day}`;
 };
 
-// Used by: public/admin-user-view.php
+
 const initMembershipDates = (formSelector) => {
     const form = document.querySelector(formSelector);
 
@@ -546,7 +545,6 @@ const renderBarChart = (containerId, entries, colorClass) => {
     });
 };
 
-// Used by: public/admin-statistics.php
 const initStatisticsCharts = () => {
     if (!window.libraryStats) {
         return;
