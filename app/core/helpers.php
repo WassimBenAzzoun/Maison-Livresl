@@ -30,7 +30,7 @@ if (!function_exists('require_login_page')) {
     {
         if (empty($_SESSION['user'])) {
             flash_set('warning', 'Vous devez être connecté pour accéder à cette page.');
-            header('Location: login.php');
+            header('Location: /guest/login.php');
             exit;
         }
     }
@@ -41,7 +41,7 @@ if (!function_exists('require_admin_page')) {
     {
         if (empty($_SESSION['admin'])) {
             flash_set('warning', 'Accès réservé à l\'administrateur.');
-            header('Location: login.php');
+            header('Location: /guest/login.php');
             exit;
         }
     }

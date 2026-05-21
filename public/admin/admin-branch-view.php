@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
 
 require_admin_page();
 
@@ -18,7 +17,7 @@ $branch = $model->find($id);
 
 if (!$branch) {
     flash_set('danger', 'Point de service introuvable.');
-    header('Location: admin-branches.php');
+    header('Location: /admin/admin-branches.php');
     exit;
 }
 
@@ -26,7 +25,7 @@ $books = $model->booksById($id);
 $currentBorrowings = $model->currentBorrowingsById($id);
 $pageTitle = 'Maison des Livres | Fiche point de service';
 $activePage = 'admin-branches';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -49,8 +48,8 @@ require __DIR__ . '/partials/header.php';
             </ul>
             <p><?= htmlspecialchars($branch->getDescription() ?: 'Aucune description renseignée.', ENT_QUOTES, 'UTF-8') ?></p>
             <div class="card-actions">
-                <a class="btn btn-primary" href="<?= 'admin-branch-form.php?id=' . rawurlencode((string) ($branch->getId())) ?>">Modifier</a>
-                <a class="btn btn-secondary" href="<?= 'admin-branches.php' ?>">Retour à la liste</a>
+                <a class="btn btn-primary" href="/admin/admin-branch-form.php?id=<?= rawurlencode((string) ($branch->getId())) ?>">Modifier</a>
+                <a class="btn btn-secondary" href="/admin/admin-branches.php">Retour à la liste</a>
             </div>
         </div>
 
@@ -97,7 +96,7 @@ require __DIR__ . '/partials/header.php';
                         data-sort-author="<?= htmlspecialchars(strtolower($book->getAuteur()), ENT_QUOTES, 'UTF-8') ?>"
                         data-sort-available="<?= htmlspecialchars((string) $book->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?>"
                     >
-                        <td><a class="table-link" href="<?= 'book.php?id=' . rawurlencode((string) ($book->getId())) ?>"><?= htmlspecialchars($book->getTitre(), ENT_QUOTES, 'UTF-8') ?></a></td>
+                        <td><a class="table-link" href="/guest/book.php?id=<?= rawurlencode((string) ($book->getId())) ?>"><?= htmlspecialchars($book->getTitre(), ENT_QUOTES, 'UTF-8') ?></a></td>
                         <td><?= htmlspecialchars($book->getAuteur(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($book->getCategorie(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars((string) $book->getAnneePublication(), ENT_QUOTES, 'UTF-8') ?></td>
@@ -175,4 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

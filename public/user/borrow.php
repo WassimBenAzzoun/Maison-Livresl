@@ -5,13 +5,12 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
-require_once __DIR__ . '/../app/models/Emprunt.php';
-require_once __DIR__ . '/../app/models/Livre.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/models/Emprunt.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 require_login_page();
 
@@ -24,20 +23,20 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $livre = $livreModel->find($id);
 if (!$livre) {
     flash_set('danger', 'Livre introuvable.');
-    header('Location: books.php');
+    header('Location: /guest/books.php');
     exit;
 }
 
 $userRecord = $userModel->findWithMembership((int) ($sessionUser['id'] ?? 0));
 if (!$userRecord) {
     flash_set('danger', 'Utilisateur introuvable.');
-    header('Location: logout.php');
+    header('Location: /user/logout.php');
     exit;
 }
 
 if (!$userRecord->hasActiveMembership()) {
     flash_set('warning', 'Une adhésion valide est requise avant de pouvoir emprunter.');
-    header('Location: profile.php');
+    header('Location: /user/profile.php');
     exit;
 }
 
@@ -79,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $livreModel->decrementStock($bibliothequeId, (int) $livre->getId());
 
         flash_set('success', 'Votre demande d\'emprunt a été enregistrée.');
-        header('Location: confirmation.php?id=' . rawurlencode((string) $empruntId));
+        header('Location: /user/confirmation.php?id=' . rawurlencode((string) $empruntId));
         exit;
     }
 }
@@ -88,7 +87,7 @@ $pageTitle = 'Maison des Livres | Emprunter un livre';
 $activePage = 'books';
 $stocks = $livre->getStocks();
 $user = $userRecord;
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -99,7 +98,11 @@ require __DIR__ . '/partials/header.php';
 
     <div class="split-layout">
         <div class="panel">
-            <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
+            <?php
+                $coverPath = $livre->getCouverture() ?: 'assets/images/book-placeholder.svg';
+                $coverPath = preg_match('#^https?://#', $coverPath) ? $coverPath : '/' . ltrim($coverPath, '/');
+            ?>
+            <img src="<?= htmlspecialchars($coverPath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
             <h2><?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?></h2>
             <p><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></p>
             <p class="muted"><?= htmlspecialchars((string) $livre->getAvailableExemplaires(), ENT_QUOTES, 'UTF-8') ?> exemplaire(s) disponible(s) dans toutes les bibliothèques</p>
@@ -166,4 +169,6 @@ require __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

@@ -8,34 +8,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="page-<?= htmlspecialchars($activePage ?? 'home', ENT_QUOTES, 'UTF-8') ?>">
+<?php
+$navBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/');
+if ($navBase === '' || $navBase === '\\') {
+    $navBase = '';
+}
+?>
 <header class="site-header">
     <div class="container nav-bar">
-        <a class="brand" href="<?= 'home.php' ?>">
+        <a class="brand" href="<?= $navBase . '/home.php' ?>">
             <span class="brand-mark">MdL</span>
             <span>Maison des Livres</span>
         </a>
 
         <nav class="nav-links">
-            <a class="<?= ($activePage ?? '') === 'home' ? 'active' : '' ?>" href="<?= 'home.php' ?>">Accueil</a>
-            <a class="<?= ($activePage ?? '') === 'books' ? 'active' : '' ?>" href="<?= 'books.php' ?>">Livres</a>
+            <a class="<?= ($activePage ?? '') === 'home' ? 'active' : '' ?>" href="<?= $navBase . '/home.php' ?>">Accueil</a>
+            <a class="<?= ($activePage ?? '') === 'books' ? 'active' : '' ?>" href="<?= $navBase . '/books.php' ?>">Livres</a>
             <?php if (!empty($_SESSION['admin'])): ?>
-                <a class="<?= ($activePage ?? '') === 'admin-dashboard' ? 'active' : '' ?>" href="<?= 'admin-dashboard.php' ?>">Aperçu</a>
-                <a class="<?= ($activePage ?? '') === 'admin-books' ? 'active' : '' ?>" href="<?= 'admin-books.php' ?>">Catalogue</a>
-                <a class="<?= ($activePage ?? '') === 'admin-borrowings' ? 'active' : '' ?>" href="<?= 'admin-borrowings.php' ?>">Emprunts</a>
-                <a class="<?= ($activePage ?? '') === 'admin-users' ? 'active' : '' ?>" href="<?= 'admin-users.php' ?>">Comptes</a>
-                <a class="<?= ($activePage ?? '') === 'admin-branches' ? 'active' : '' ?>" href="<?= 'admin-branches.php' ?>">Points de service</a>
-                <a class="<?= ($activePage ?? '') === 'admin-statistics' ? 'active' : '' ?>" href="<?= 'admin-statistics.php' ?>">Statistiques</a>
-                <a href="<?= 'admin-logout.php' ?>">Déconnexion</a>
+                <a class="<?= ($activePage ?? '') === 'admin-dashboard' ? 'active' : '' ?>" href="<?= $navBase . '/admin-dashboard.php' ?>">Aperçu</a>
+                <a class="<?= ($activePage ?? '') === 'admin-books' ? 'active' : '' ?>" href="<?= $navBase . '/admin-books.php' ?>">Catalogue</a>
+                <a class="<?= ($activePage ?? '') === 'admin-borrowings' ? 'active' : '' ?>" href="<?= $navBase . '/admin-borrowings.php' ?>">Emprunts</a>
+                <a class="<?= ($activePage ?? '') === 'admin-users' ? 'active' : '' ?>" href="<?= $navBase . '/admin-users.php' ?>">Comptes</a>
+                <a class="<?= ($activePage ?? '') === 'admin-branches' ? 'active' : '' ?>" href="<?= $navBase . '/admin-branches.php' ?>">Points de service</a>
+                <a class="<?= ($activePage ?? '') === 'admin-statistics' ? 'active' : '' ?>" href="<?= $navBase . '/admin-statistics.php' ?>">Statistiques</a>
+                <a href="<?= $navBase . '/admin-logout.php' ?>">Déconnexion</a>
             <?php elseif (!empty($_SESSION['user'])): ?>
-                <a class="<?= ($activePage ?? '') === 'profile' ? 'active' : '' ?>" href="<?= 'profile.php' ?>">Mon profil</a>
-                <a class="<?= ($activePage ?? '') === 'my-borrowings' ? 'active' : '' ?>" href="<?= 'my-borrowings.php' ?>">Mes emprunts</a>
-                <a href="<?= 'logout.php' ?>">Déconnexion</a>
+                <a class="<?= ($activePage ?? '') === 'profile' ? 'active' : '' ?>" href="<?= $navBase . '/profile.php' ?>">Mon profil</a>
+                <a class="<?= ($activePage ?? '') === 'my-borrowings' ? 'active' : '' ?>" href="<?= $navBase . '/my-borrowings.php' ?>">Mes emprunts</a>
+                <a href="<?= $navBase . '/logout.php' ?>">Déconnexion</a>
             <?php else: ?>
-                <a class="<?= ($activePage ?? '') === 'login' ? 'active' : '' ?>" href="<?= 'login.php' ?>">Connexion</a>
-                <a class="<?= ($activePage ?? '') === 'register' ? 'active' : '' ?>" href="<?= 'register.php' ?>">Inscription</a>
+                <a class="<?= ($activePage ?? '') === 'login' ? 'active' : '' ?>" href="<?= $navBase . '/login.php' ?>">Connexion</a>
+                <a class="<?= ($activePage ?? '') === 'register' ? 'active' : '' ?>" href="<?= $navBase . '/register.php' ?>">Inscription</a>
             <?php endif; ?>
         </nav>
     </div>

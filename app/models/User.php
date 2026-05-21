@@ -1,7 +1,10 @@
 <?php
 
-class User extends Model
+require_once __DIR__ . '/../config/Database.php';
+
+class User
 {
+    private PDO $db;
     private ?int $id = null;
     private string $fullName = '';
     private string $email = '';
@@ -18,12 +21,7 @@ class User extends Model
 
     public function __construct(array $data = [])
     {
-        parent::__construct();
-        $this->hydrate($data);
-    }
-
-    private function hydrate(array $data): void
-    {
+        $this->db = Database::getConnection();
         $this->id = isset($data['id']) ? (int) $data['id'] : null;
         $this->fullName = $data['full_name'] ?? '';
         $this->email = $data['email'] ?? '';
@@ -39,6 +37,14 @@ class User extends Model
         $this->membershipBranchName = $data['membership_branch_name'] ?? '';
     }
 
+    private function run(string $sql, array $params = []): PDOStatement
+    {
+        $statement = $this->db->prepare($sql);
+        $statement->execute($params);
+
+        return $statement;
+    }
+
     public function getId(): ?int { return $this->id; }
     public function getFullName(): string { return $this->fullName; }
     public function getEmail(): string { return $this->email; }
@@ -52,6 +58,7 @@ class User extends Model
     public function getMembershipExpiresAt(): ?string { return $this->membershipExpiresAt; }
     public function getMembershipBranchId(): ?int { return $this->membershipBranchId; }
     public function getMembershipBranchName(): string { return $this->membershipBranchName; }
+
     public function hasActiveMembership(): bool
     {
         if ($this->role === 'admin') {
@@ -73,32 +80,33 @@ class User extends Model
     public function setStatus(string $status): void { $this->status = $status; }
     public function setRole(string $role): void { $this->role = $role; }
 
-    protected function hydrateRow(array $row): User
-    {
-        return new User($row);
-    }
-
     public function all(): array
     {
-        $rows = $this->fetchAll('SELECT * FROM users ORDER BY created_at DESC');
-        return $this->hydrateRows($rows);
+        $rows = $this->run('SELECT * FROM users ORDER BY created_at DESC')->fetchAll();
+        $items = [];
+
+        foreach ($rows as $row) {
+            $items[] = new self($row);
+        }
+
+        return $items;
     }
 
     public function find(int $id): ?User
     {
-        $row = $this->fetchOne('SELECT * FROM users WHERE id = :id LIMIT 1', ['id' => $id]);
-        return $row ? $this->hydrateRow($row) : null;
+        $row = $this->run('SELECT * FROM users WHERE id = :id LIMIT 1', ['id' => $id])->fetch();
+        return $row ? new self($row) : null;
     }
 
     public function findByEmail(string $email): ?User
     {
-        $row = $this->fetchOne('SELECT * FROM users WHERE email = :email LIMIT 1', ['email' => $email]);
-        return $row ? $this->hydrateRow($row) : null;
+        $row = $this->run('SELECT * FROM users WHERE email = :email LIMIT 1', ['email' => $email])->fetch();
+        return $row ? new self($row) : null;
     }
 
     public function create(array $data): bool
     {
-        return $this->execute(
+        return $this->run(
             'INSERT INTO users (full_name, email, phone, password, address, status, role, membership_type, membership_paid_at, membership_expires_at, membership_branch_id, created_at, updated_at)
              VALUES (:full_name, :email, :phone, :password, :address, :status, :role, :membership_type, :membership_paid_at, :membership_expires_at, :membership_branch_id, NOW(), NOW())',
             [
@@ -149,13 +157,12 @@ class User extends Model
         }
 
         $sql .= ' WHERE id = :id';
-
-        return $this->execute($sql, $params)->rowCount() > 0;
+        return $this->run($sql, $params)->rowCount() > 0;
     }
 
     public function updateMembership(int $id, array $data): bool
     {
-        return $this->execute(
+        return $this->run(
             'UPDATE users
              SET membership_type = :membership_type,
                  membership_paid_at = :membership_paid_at,
@@ -175,7 +182,7 @@ class User extends Model
 
     public function toggleStatus(int $id): bool
     {
-        return $this->execute(
+        return $this->run(
             'UPDATE users SET status = CASE WHEN status = \'active\' THEN \'inactive\' ELSE \'active\' END, updated_at = NOW() WHERE id = :id',
             ['id' => $id]
         )->rowCount() > 0;
@@ -183,25 +190,25 @@ class User extends Model
 
     public function delete(int $id): bool
     {
-        return $this->execute('DELETE FROM users WHERE id = :id', ['id' => $id])->rowCount() > 0;
+        return $this->run('DELETE FROM users WHERE id = :id', ['id' => $id])->rowCount() > 0;
     }
 
     public function countTotal(): int
     {
-        return (int) $this->fetchOne('SELECT COUNT(*) AS total FROM users')['total'];
+        return (int) $this->run('SELECT COUNT(*) FROM users')->fetchColumn();
     }
 
     public function findWithMembership(int $id): ?User
     {
-        $row = $this->fetchOne(
+        $row = $this->run(
             'SELECT u.*, b.nom AS membership_branch_name
              FROM users u
              LEFT JOIN bibliotheques b ON b.id = u.membership_branch_id
              WHERE u.id = :id
              LIMIT 1',
             ['id' => $id]
-        );
+        )->fetch();
 
-        return $row ? $this->hydrateRow($row) : null;
+        return $row ? new self($row) : null;
     }
 }

@@ -5,11 +5,10 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
-require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
 
 require_admin_page();
 
@@ -54,7 +53,7 @@ function handle_cover_upload(?array $file): string|false|null
         return false;
     }
 
-    $uploadDir = __DIR__ . '/assets/uploads/books';
+    $uploadDir = __DIR__ . '/../../assets/uploads/books';
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
         flash_set('warning', 'Impossible de créer le dossier des couvertures.');
         return false;
@@ -68,7 +67,7 @@ function handle_cover_upload(?array $file): string|false|null
         return false;
     }
 
-    return 'assets/uploads/books/' . $filename;
+    return '/assets/uploads/books/' . $filename;
 }
 
 function save_library_stocks(Livre $model, int $livreId, array $libraryStocks): void
@@ -93,7 +92,7 @@ if ($id > 0) {
     $livre = $model->find($id);
     if (!$livre) {
         flash_set('danger', 'Livre introuvable.');
-        header('Location: admin-books.php');
+        header('Location: /admin/admin-books.php');
         exit;
     }
 } else {
@@ -116,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash_set('warning', 'Veuillez remplir les champs obligatoires.');
     } elseif ($uploadedCover === false) {
         $query = $id > 0 ? '?id=' . rawurlencode((string) $id) : '';
-        header('Location: admin-book-form.php' . $query);
+        header('Location: /admin/admin-book-form.php' . $query);
         exit;
     } elseif ($id > 0) {
         if (is_string($uploadedCover)) {
@@ -134,13 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash_set('success', 'Livre ajouté avec succès.');
     }
 
-    header('Location: admin-books.php');
+    header('Location: /admin/admin-books.php');
     exit;
 }
 
 $pageTitle = $id ? 'Maison des Livres | Modifier un livre' : 'Maison des Livres | Ajouter un livre';
 $activePage = 'admin-books';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <?php $isEdit = !empty($livre->getId()); ?>
@@ -177,7 +176,11 @@ require __DIR__ . '/partials/header.php';
         <?php if ($livre->getCouverture() !== ''): ?>
             <div class="detail-card">
                 <p class="muted">Couverture actuelle</p>
-                <img src="<?= htmlspecialchars($livre->getCouverture(), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre() ?: 'Couverture du livre', ENT_QUOTES, 'UTF-8') ?>" class="detail-cover">
+                <?php
+                    $coverPath = $livre->getCouverture() ?: 'assets/images/book-placeholder.svg';
+                    $coverPath = preg_match('#^https?://#', $coverPath) ? $coverPath : '/' . ltrim($coverPath, '/');
+                ?>
+                <img src="<?= htmlspecialchars($coverPath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre() ?: 'Couverture du livre', ENT_QUOTES, 'UTF-8') ?>" class="detail-cover">
             </div>
         <?php endif; ?>
         <div class="section-head section-head-small">
@@ -232,4 +235,6 @@ require __DIR__ . '/partials/header.php';
     </form>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

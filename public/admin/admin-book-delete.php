@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
 
 require_admin_page();
 
@@ -18,5 +17,7 @@ if ($id > 0) {
     flash_set('success', 'Livre supprimé.');
 }
 
-header('Location: admin-books.php');
+header('Location: /admin/admin-books.php');
 exit;
+
+

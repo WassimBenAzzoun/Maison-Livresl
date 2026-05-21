@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 require_admin_page();
 
@@ -29,5 +28,7 @@ if ($target && $target->getRole() === 'admin') {
     }
 }
 
-header('Location: admin-users.php');
+header('Location: /admin/admin-users.php');
 exit;
+
+

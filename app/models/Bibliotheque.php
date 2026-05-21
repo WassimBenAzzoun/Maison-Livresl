@@ -1,10 +1,12 @@
 <?php
 
+require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/Emprunt.php';
 require_once __DIR__ . '/Livre.php';
 
-class Bibliotheque extends Model
+class Bibliotheque
 {
+    private PDO $db;
     private ?int $id = null;
     private string $nom = '';
     private string $adresse = '';
@@ -18,12 +20,7 @@ class Bibliotheque extends Model
 
     public function __construct(array $data = [])
     {
-        parent::__construct();
-        $this->hydrate($data);
-    }
-
-    private function hydrate(array $data): void
-    {
+        $this->db = Database::getConnection();
         $this->id = isset($data['id']) ? (int) $data['id'] : null;
         $this->nom = $data['nom'] ?? '';
         $this->adresse = $data['adresse'] ?? '';
@@ -34,6 +31,14 @@ class Bibliotheque extends Model
         $this->longitude = isset($data['longitude']) ? (float) $data['longitude'] : 0.0;
         $this->bookCount = (int) ($data['book_count'] ?? 0);
         $this->currentBorrowingsCount = (int) ($data['current_borrowings_count'] ?? 0);
+    }
+
+    private function run(string $sql, array $params = []): PDOStatement
+    {
+        $statement = $this->db->prepare($sql);
+        $statement->execute($params);
+
+        return $statement;
     }
 
     public function getId(): ?int { return $this->id; }
@@ -55,47 +60,48 @@ class Bibliotheque extends Model
     public function setLatitude(float $latitude): void { $this->latitude = $latitude; }
     public function setLongitude(float $longitude): void { $this->longitude = $longitude; }
 
-    protected function hydrateRow(array $row): Bibliotheque
-    {
-        return new Bibliotheque($row);
-    }
-
     public function all(): array
     {
-        $rows = $this->fetchAll(
+        $rows = $this->run(
             'SELECT b.*,
                     (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-              FROM bibliotheques b
-              ORDER BY b.created_at DESC'
-        );
+             FROM bibliotheques b
+             ORDER BY b.created_at DESC'
+        )->fetchAll();
 
-        return $this->hydrateRows($rows);
+        $items = [];
+        foreach ($rows as $row) {
+            $items[] = new self($row);
+        }
+
+        return $items;
     }
 
     public function allWithBookCounts(): array
     {
-        return $this->fetchAll(
+        return $this->run(
             'SELECT b.*,
                     (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-              FROM bibliotheques b
-              ORDER BY b.nom ASC'
-        );
+             FROM bibliotheques b
+             ORDER BY b.nom ASC'
+        )->fetchAll();
     }
 
     public function find(int $id): ?Bibliotheque
     {
-        $row = $this->fetchOne(
+        $row = $this->run(
             'SELECT b.*,
                     (SELECT COUNT(*) FROM bibliotheque_livres bl WHERE bl.bibliotheque_id = b.id) AS book_count,
                     (SELECT COUNT(*) FROM emprunts e WHERE e.bibliotheque_id = b.id AND e.status IN (\'pending\', \'confirmed\')) AS current_borrowings_count
-              FROM bibliotheques b
-              WHERE b.id = :id
-              LIMIT 1',
+             FROM bibliotheques b
+             WHERE b.id = :id
+             LIMIT 1',
             ['id' => $id]
-        );
-        return $row ? $this->hydrateRow($row) : null;
+        )->fetch();
+
+        return $row ? new self($row) : null;
     }
 
     public function booksById(int $id): array
@@ -105,17 +111,16 @@ class Bibliotheque extends Model
 
     public function currentBorrowingsById(int $id): array
     {
-        $rows = $this->fetchAll(
+        $rows = $this->run(
             'SELECT e.*, u.full_name AS user_name, u.status AS user_status
              FROM emprunts e
              LEFT JOIN users u ON u.id = e.user_id
              WHERE e.bibliotheque_id = :id AND e.status IN (\'pending\', \'confirmed\')
              ORDER BY e.created_at DESC',
             ['id' => $id]
-        );
+        )->fetchAll();
 
         $items = [];
-
         foreach ($rows as $row) {
             $items[] = new Emprunt($row);
         }
@@ -125,7 +130,7 @@ class Bibliotheque extends Model
 
     public function create(array $data): bool
     {
-        return $this->execute(
+        return $this->run(
             'INSERT INTO bibliotheques (nom, adresse, ville, telephone, description, latitude, longitude, created_at, updated_at)
              VALUES (:nom, :adresse, :ville, :telephone, :description, :latitude, :longitude, NOW(), NOW())',
             [
@@ -142,7 +147,7 @@ class Bibliotheque extends Model
 
     public function update(int $id, array $data): bool
     {
-        return $this->execute(
+        return $this->run(
             'UPDATE bibliotheques
              SET nom = :nom,
                  adresse = :adresse,
@@ -168,6 +173,6 @@ class Bibliotheque extends Model
 
     public function delete(int $id): bool
     {
-        return $this->execute('DELETE FROM bibliotheques WHERE id = :id', ['id' => $id])->rowCount() > 0;
+        return $this->run('DELETE FROM bibliotheques WHERE id = :id', ['id' => $id])->rowCount() > 0;
     }
 }

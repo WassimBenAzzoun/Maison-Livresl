@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 require_admin_page();
 
@@ -16,7 +15,7 @@ $pageTitle = 'Maison des Livres | Utilisateurs';
 $activePage = 'admin-users';
 $users = (new User())->all();
 
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -91,4 +90,6 @@ require __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

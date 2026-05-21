@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -33,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         session_regenerate_id(true);
         flash_set('success', 'Connexion réussie.');
-        header('Location: ' . ($user->getRole() === 'admin' ? 'admin-dashboard.php' : 'profile.php'));
+        header('Location: ' . ($user->getRole() === 'admin' ? '/admin/admin-dashboard.php' : '/user/profile.php'));
         exit;
     }
 
@@ -42,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Maison des Livres | Connexion';
 $activePage = 'login';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="auth-layout">
@@ -56,8 +55,10 @@ require __DIR__ . '/partials/header.php';
             <input class="form-control" type="password" name="password" required>
         </label>
         <button class="btn btn-primary" type="submit">Entrer</button>
-        <p class="muted">Pas encore de compte ? <a href="<?= 'register.php' ?>">Créer un accès</a></p>
+        <p class="muted">Pas encore de compte ? <a href="/guest/register.php">Créer un accès</a></p>
     </form>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

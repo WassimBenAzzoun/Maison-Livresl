@@ -268,6 +268,87 @@ img {
     margin-top: 28px;
 }
 
+.quote-section {
+    display: grid;
+    gap: 18px;
+}
+
+.quote-card {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    gap: 16px;
+    padding: 28px;
+    background:
+        radial-gradient(circle at top right, rgba(24, 169, 153, 0.14), transparent 28%),
+        linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(255, 250, 243, 0.96) 46%, rgba(180, 83, 9, 0.08));
+    border: 1px solid rgba(15, 118, 110, 0.12);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+}
+
+.quote-card::before {
+    content: '“';
+    position: absolute;
+    top: -12px;
+    right: 18px;
+    font-size: clamp(6rem, 14vw, 9rem);
+    line-height: 1;
+    color: rgba(15, 118, 110, 0.12);
+    pointer-events: none;
+}
+
+.quote-card-top,
+.quote-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.quote-status {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--secondary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.quote-text {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: 62ch;
+    font-size: clamp(1.3rem, 2.8vw, 2rem);
+    line-height: 1.55;
+    color: var(--text);
+}
+
+.quote-author {
+    position: relative;
+    z-index: 1;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.quote-card.is-loading .quote-text {
+    opacity: 0.75;
+}
+
+.quote-card.is-error {
+    border-color: rgba(180, 35, 24, 0.18);
+}
+
+.quote-card.is-error .quote-status {
+    color: var(--danger);
+}
+
 .grid {
     display: grid;
     gap: 18px;
@@ -481,6 +562,22 @@ select.form-control:focus {
 .no-results.hidden,
 .hidden {
     display: none;
+}
+
+@media (max-width: 720px) {
+    .quote-card {
+        padding: 22px;
+    }
+
+    .quote-card-top,
+    .quote-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .quote-card .btn {
+        width: 100%;
+    }
 }
 
 .map-grid {

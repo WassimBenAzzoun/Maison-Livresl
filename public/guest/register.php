@@ -5,10 +5,9 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullName = trim($_POST['full_name'] ?? '');
@@ -40,14 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         flash_set('success', 'Compte créé avec succès. Vous pouvez vous connecter.');
-        header('Location: login.php');
-            exit;
+        header('Location: /guest/login.php');
+        exit;
     }
 }
 
 $pageTitle = 'Maison des Livres | Inscription';
 $activePage = 'register';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="auth-layout">
@@ -73,8 +72,10 @@ require __DIR__ . '/partials/header.php';
             <input class="form-control" type="password" name="password_confirm" required>
         </label>
         <button class="btn btn-primary" type="submit">Créer mon accès</button>
-        <p class="muted">Déjà inscrit ? <a href="<?= 'login.php' ?>">Accéder à mon espace</a></p>
+        <p class="muted">Déjà inscrit ? <a href="/guest/login.php">Accéder à mon espace</a></p>
     </form>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

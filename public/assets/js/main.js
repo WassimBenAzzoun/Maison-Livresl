@@ -545,6 +545,78 @@ const renderBarChart = (containerId, entries, colorClass) => {
     });
 };
 
+const initHomeQuote = () => {
+    const card = document.querySelector('[data-home-quote]');
+
+    if (!card) {
+        return;
+    }
+
+    const text = card.querySelector('[data-home-quote-text]');
+    const author = card.querySelector('[data-home-quote-author]');
+    const status = card.querySelector('[data-home-quote-status]');
+    const refreshButton = card.querySelector('[data-home-quote-refresh]');
+    const endpoint = 'https://quotes-api-seven.vercel.app/api/quotes/random';
+
+    const setLoading = () => {
+        card.classList.add('is-loading');
+        card.classList.remove('is-error');
+        card.setAttribute('aria-busy', 'true');
+        status.textContent = 'Chargement de la citation...';
+        text.textContent = '« Une citation arrive dans un instant. »';
+        author.textContent = 'Maison des Livres';
+        refreshButton.disabled = true;
+    };
+
+    const setQuote = (quote, quoteAuthor) => {
+        card.classList.remove('is-loading', 'is-error');
+        card.setAttribute('aria-busy', 'false');
+        status.textContent = 'Citation du jour';
+        text.textContent = `« ${quote} »`;
+        author.textContent = quoteAuthor || 'Auteur inconnu';
+        refreshButton.disabled = false;
+    };
+
+    const setError = () => {
+        card.classList.remove('is-loading');
+        card.classList.add('is-error');
+        card.setAttribute('aria-busy', 'false');
+        status.textContent = 'La citation n’a pas pu être chargée.';
+        text.textContent = 'Veuillez réessayer dans un instant.';
+        author.textContent = 'Quotes API';
+        refreshButton.disabled = false;
+    };
+
+    const loadQuote = async () => {
+        setLoading();
+
+        try {
+            const response = await fetch(endpoint);
+
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            const quote = data && typeof data.quote === 'string' ? data.quote.trim() : '';
+            const quoteAuthor = data && typeof data.author === 'string' ? data.author.trim() : '';
+
+            if (!quote) {
+                throw new Error('Unexpected quote format');
+            }
+
+            setQuote(quote, quoteAuthor);
+        } catch (error) {
+            setError();
+        }
+    };
+
+    refreshButton.addEventListener('click', loadQuote);
+    loadQuote();
+};
+
+window.initHomeQuote = initHomeQuote;
+
 const initStatisticsCharts = () => {
     if (!window.libraryStats) {
         return;

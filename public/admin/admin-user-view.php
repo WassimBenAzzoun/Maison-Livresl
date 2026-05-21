@@ -5,12 +5,11 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
-require_once __DIR__ . '/../app/models/Emprunt.php';
-require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/models/Emprunt.php';
+require_once __DIR__ . '/../../app/models/User.php';
 
 require_admin_page();
 
@@ -19,7 +18,7 @@ $userModel = new User();
 $user = $userModel->findWithMembership($id);
 if (!$user) {
     flash_set('danger', 'Utilisateur introuvable.');
-    header('Location: admin-users.php');
+    header('Location: /admin/admin-users.php');
     exit;
 }
 
@@ -54,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'membe
         flash_set('success', 'Adhésion mise à jour.');
     }
 
-    header('Location: admin-user-view.php?id=' . rawurlencode((string) $id));
+    header('Location: /admin/admin-user-view.php?id=' . rawurlencode((string) $id));
     exit;
 }
 
@@ -64,7 +63,7 @@ $previousBorrowings = $empruntModel->previousByUser((int) $user->getId());
 $branches = (new Bibliotheque())->all();
 $pageTitle = 'Maison des Livres | Fiche utilisateur';
 $activePage = 'admin-users';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -107,7 +106,7 @@ require __DIR__ . '/partials/header.php';
         <p>Attribuez une formule mensuelle ou annuelle et fixez la date d'expiration.</p>
     </div>
 
-    <form class="panel form-stack" method="post" action="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($user->getId())) ?>" data-membership-form>
+    <form class="panel form-stack" method="post" action="/admin/admin-user-view.php?id=<?= rawurlencode((string) ($user->getId())) ?>" data-membership-form>
         <input type="hidden" name="action" value="membership_save">
         <label>Formule
             <select class="form-control" name="membership_type" required data-membership-type>
@@ -236,4 +235,6 @@ require __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

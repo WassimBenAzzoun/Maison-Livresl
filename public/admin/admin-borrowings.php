@@ -5,11 +5,10 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Emprunt.php';
-require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Emprunt.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
 
 require_admin_page();
 
@@ -50,14 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header('Location: admin-borrowings.php');
+    header('Location: /admin/admin-borrowings.php');
     exit;
 }
 
 $pageTitle = 'Maison des Livres | Gestion des emprunts';
 $activePage = 'admin-borrowings';
 $emprunts = $empruntModel->allWithRelations();
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -107,7 +106,7 @@ require __DIR__ . '/partials/header.php';
                         <td>#<?= htmlspecialchars((string) $borrow->getId(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <?php if ($borrow->getUserId()): ?>
-                                <a class="table-link" href="<?= 'admin-user-view.php?id=' . rawurlencode((string) ($borrow->getUserId())) ?>"><?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?></a>
+                                <a class="table-link" href="/admin/admin-user-view.php?id=<?= rawurlencode((string) ($borrow->getUserId())) ?>"><?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?></a>
                             <?php else: ?>
                                 <?= htmlspecialchars($borrow->getUserName() ?: $borrow->getFullName(), ENT_QUOTES, 'UTF-8') ?>
                             <?php endif; ?>
@@ -115,7 +114,7 @@ require __DIR__ . '/partials/header.php';
                         <td><?= htmlspecialchars($borrow->getLivreTitre(), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <?php if ($borrow->getBibliothequeId()): ?>
-                                <a class="table-link" href="<?= 'admin-branch-view.php?id=' . rawurlencode((string) ($borrow->getBibliothequeId())) ?>"><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></a>
+                                <a class="table-link" href="/admin/admin-branch-view.php?id=<?= rawurlencode((string) ($borrow->getBibliothequeId())) ?>"><?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?></a>
                             <?php else: ?>
                                 <?= htmlspecialchars($borrow->getBibliothequeNom(), ENT_QUOTES, 'UTF-8') ?>
                             <?php endif; ?>
@@ -147,4 +146,6 @@ require __DIR__ . '/partials/header.php';
     </div>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

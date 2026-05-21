@@ -5,18 +5,17 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
-require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $livre = (new Livre())->find($id);
 
 if (!$livre) {
     flash_set('danger', 'Livre introuvable.');
-    header('Location: books.php');
+    header('Location: /guest/books.php');
     exit;
 }
 
@@ -36,13 +35,17 @@ foreach ($stocks as $stock) {
 
 $pageTitle = 'Maison des Livres | ' . $livre->getTitre();
 $activePage = 'books';
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
     <div class="detail-layout">
         <div class="detail-card">
-            <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="detail-cover">
+            <?php
+                $coverPath = $livre->getCouverture() ?: 'assets/images/book-placeholder.svg';
+                $coverPath = preg_match('#^https?://#', $coverPath) ? $coverPath : '/' . ltrim($coverPath, '/');
+            ?>
+            <img src="<?= htmlspecialchars($coverPath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="detail-cover">
         </div>
 
         <div class="detail-card">
@@ -86,7 +89,7 @@ require __DIR__ . '/partials/header.php';
                                 data-sort-branch="<?= htmlspecialchars(strtolower($stock['bibliotheque_nom'] ?? '-'), ENT_QUOTES, 'UTF-8') ?>"
                                 data-sort-available="<?= htmlspecialchars((string) ($stock['available_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?>"
                             >
-                                <td><a class="table-link" href="books.php?branch_id=<?= htmlspecialchars((string) $stock['bibliotheque_id'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($stock['bibliotheque_nom'] ?? '-', ENT_QUOTES, 'UTF-8') ?></a></td>
+                                <td><a class="table-link" href="/guest/books.php?branch_id=<?= htmlspecialchars((string) $stock['bibliotheque_id'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($stock['bibliotheque_nom'] ?? '-', ENT_QUOTES, 'UTF-8') ?></a></td>
                                 <td><?= htmlspecialchars($stock['bibliotheque_adresse'] ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars((string) ($stock['available_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?>/<?= htmlspecialchars((string) ($stock['total_exemplaires'] ?? 0), ENT_QUOTES, 'UTF-8') ?></td>
                             </tr>
@@ -96,8 +99,8 @@ require __DIR__ . '/partials/header.php';
             </div>
 
             <div class="card-actions">
-                <a class="btn btn-primary" href="<?= 'borrow.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Emprunter ce livre</a>
-                <a class="btn btn-secondary" href="<?= 'books.php' ?>">Retour au catalogue</a>
+                <a class="btn btn-primary" href="/user/borrow.php?id=<?= rawurlencode((string) ($livre->getId())) ?>">Emprunter ce livre</a>
+                <a class="btn btn-secondary" href="/guest/books.php">Retour au catalogue</a>
             </div>
         </div>
     </div>
@@ -122,4 +125,6 @@ require __DIR__ . '/partials/header.php';
     </script>
 <?php endif; ?>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+

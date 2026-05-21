@@ -5,11 +5,10 @@ session_start();
 header('Content-Type: text/html; charset=UTF-8');
 ini_set('default_charset', 'UTF-8');
 
-require_once __DIR__ . '/../app/core/helpers.php';
-require_once __DIR__ . '/../app/config/Database.php';
-require_once __DIR__ . '/../app/core/Model.php';
-require_once __DIR__ . '/../app/models/Bibliotheque.php';
-require_once __DIR__ . '/../app/models/Livre.php';
+require_once __DIR__ . '/../../app/core/helpers.php';
+require_once __DIR__ . '/../../app/config/Database.php';
+require_once __DIR__ . '/../../app/models/Bibliotheque.php';
+require_once __DIR__ . '/../../app/models/Livre.php';
 
 $pageTitle = 'Maison des Livres | Catalogue';
 $activePage = 'books';
@@ -19,7 +18,7 @@ $livreModel = new Livre();
 $livres = $selectedBranchId > 0 ? $livreModel->findByBranch($selectedBranchId) : $livreModel->all();
 $branches = (new Bibliotheque())->all();
 
-require __DIR__ . '/partials/header.php';
+require __DIR__ . '/../partials/header.php';
 ?>
 
 <section class="section">
@@ -60,8 +59,12 @@ require __DIR__ . '/partials/header.php';
     </div>
 
     <div class="grid cards-3" data-books-grid>
-        <?php foreach ($livres as $livre): ?>
+            <?php foreach ($livres as $livre): ?>
             <?php $available = $livre->getAvailableExemplaires() > 0; ?>
+            <?php
+                $coverPath = $livre->getCouverture() ?: 'assets/images/book-placeholder.svg';
+                $coverPath = preg_match('#^https?://#', $coverPath) ? $coverPath : '/' . ltrim($coverPath, '/');
+            ?>
             <article
                 class="card book-card"
                 data-book-card
@@ -72,7 +75,7 @@ require __DIR__ . '/partials/header.php';
                 data-branch-name="<?= htmlspecialchars(strtolower($livre->getBibliothequeNom() ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                 data-availability="<?= $available ? 'available' : 'unavailable' ?>"
             >
-                <img src="<?= htmlspecialchars($livre->getCouverture() ?: 'assets/images/book-placeholder.svg', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
+                <img src="<?= htmlspecialchars($coverPath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($livre->getTitre(), ENT_QUOTES, 'UTF-8') ?>" class="book-cover">
                 <div class="card-body">
                     <div class="card-headline">
                         <span class="tag"><?= htmlspecialchars($livre->getCategorie(), ENT_QUOTES, 'UTF-8') ?></span>
@@ -84,8 +87,8 @@ require __DIR__ . '/partials/header.php';
                     <p><?= htmlspecialchars($livre->getAuteur(), ENT_QUOTES, 'UTF-8') ?></p>
                     <p class="muted"><?= htmlspecialchars((string) $livre->getAnneePublication(), ENT_QUOTES, 'UTF-8') ?> · <?= htmlspecialchars($livre->getBibliothequeNom() ?? 'Bibliothèque non définie', ENT_QUOTES, 'UTF-8') ?></p>
                     <div class="card-actions">
-                        <a class="btn btn-secondary" href="<?= 'book.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Détails</a>
-                        <a class="btn btn-primary" href="<?= 'borrow.php?id=' . rawurlencode((string) ($livre->getId())) ?>">Emprunter</a>
+                        <a class="btn btn-secondary" href="/guest/book.php?id=<?= rawurlencode((string) ($livre->getId())) ?>">Détails</a>
+                        <a class="btn btn-primary" href="/user/borrow.php?id=<?= rawurlencode((string) ($livre->getId())) ?>">Emprunter</a>
                     </div>
                 </div>
             </article>
@@ -95,4 +98,6 @@ require __DIR__ . '/partials/header.php';
     <p class="no-results hidden" data-no-results>Aucun livre ne correspond à votre recherche.</p>
 </section>
 
-<?php require __DIR__ . '/partials/footer.php'; ?>
+<?php require __DIR__ . '/../partials/footer.php'; ?>
+
+
