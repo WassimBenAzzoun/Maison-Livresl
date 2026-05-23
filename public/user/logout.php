@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../app/core/helpers.php';
 
 unset($_SESSION['user'], $_SESSION['admin']);
 flash_set('success', 'Vous êtes déconnecté.');
-header('Location: /guest/home.php');
+header('Location: /index.php');
 exit;
 
 

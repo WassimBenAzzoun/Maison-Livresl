@@ -19,29 +19,29 @@ if ($navBase === '' || $navBase === '\\') {
 ?>
 <header class="site-header">
     <div class="container nav-bar">
-        <a class="brand" href="<?= $navBase . '/home.php' ?>">
+        <a class="brand" href="/index.php">
             <span class="brand-mark">MdL</span>
             <span>Maison des Livres</span>
         </a>
 
         <nav class="nav-links">
-            <a class="<?= ($activePage ?? '') === 'home' ? 'active' : '' ?>" href="<?= $navBase . '/home.php' ?>">Accueil</a>
-            <a class="<?= ($activePage ?? '') === 'books' ? 'active' : '' ?>" href="<?= $navBase . '/books.php' ?>">Livres</a>
+            <a class="<?= ($activePage ?? '') === 'home' ? 'active' : '' ?>" href="/index.php">Accueil</a>
+            <a class="<?= ($activePage ?? '') === 'books' ? 'active' : '' ?>" href="/guest/books.php">Livres</a>
             <?php if (!empty($_SESSION['admin'])): ?>
-                <a class="<?= ($activePage ?? '') === 'admin-dashboard' ? 'active' : '' ?>" href="<?= $navBase . '/admin-dashboard.php' ?>">Aperçu</a>
-                <a class="<?= ($activePage ?? '') === 'admin-books' ? 'active' : '' ?>" href="<?= $navBase . '/admin-books.php' ?>">Catalogue</a>
-                <a class="<?= ($activePage ?? '') === 'admin-borrowings' ? 'active' : '' ?>" href="<?= $navBase . '/admin-borrowings.php' ?>">Emprunts</a>
-                <a class="<?= ($activePage ?? '') === 'admin-users' ? 'active' : '' ?>" href="<?= $navBase . '/admin-users.php' ?>">Comptes</a>
-                <a class="<?= ($activePage ?? '') === 'admin-branches' ? 'active' : '' ?>" href="<?= $navBase . '/admin-branches.php' ?>">Points de service</a>
-                <a class="<?= ($activePage ?? '') === 'admin-statistics' ? 'active' : '' ?>" href="<?= $navBase . '/admin-statistics.php' ?>">Statistiques</a>
-                <a href="<?= $navBase . '/admin-logout.php' ?>">Déconnexion</a>
+                <a class="<?= ($activePage ?? '') === 'admin-dashboard' ? 'active' : '' ?>" href="/admin/admin-dashboard.php">Aperçu</a>
+                <a class="<?= ($activePage ?? '') === 'admin-books' ? 'active' : '' ?>" href="/admin/admin-books.php">Catalogue</a>
+                <a class="<?= ($activePage ?? '') === 'admin-borrowings' ? 'active' : '' ?>" href="/admin/admin-borrowings.php">Emprunts</a>
+                <a class="<?= ($activePage ?? '') === 'admin-users' ? 'active' : '' ?>" href="/admin/admin-users.php">Comptes</a>
+                <a class="<?= ($activePage ?? '') === 'admin-branches' ? 'active' : '' ?>" href="/admin/admin-branches.php">Points de service</a>
+                <a class="<?= ($activePage ?? '') === 'admin-statistics' ? 'active' : '' ?>" href="/admin/admin-statistics.php">Statistiques</a>
+                <a href="/admin/admin-logout.php">Déconnexion</a>
             <?php elseif (!empty($_SESSION['user'])): ?>
-                <a class="<?= ($activePage ?? '') === 'profile' ? 'active' : '' ?>" href="<?= $navBase . '/profile.php' ?>">Mon profil</a>
-                <a class="<?= ($activePage ?? '') === 'my-borrowings' ? 'active' : '' ?>" href="<?= $navBase . '/my-borrowings.php' ?>">Mes emprunts</a>
-                <a href="<?= $navBase . '/logout.php' ?>">Déconnexion</a>
+                <a class="<?= ($activePage ?? '') === 'profile' ? 'active' : '' ?>" href="/user/profile.php">Mon profil</a>
+                <a class="<?= ($activePage ?? '') === 'my-borrowings' ? 'active' : '' ?>" href="/user/my-borrowings.php">Mes emprunts</a>
+                <a href="/user/logout.php">Déconnexion</a>
             <?php else: ?>
-                <a class="<?= ($activePage ?? '') === 'login' ? 'active' : '' ?>" href="<?= $navBase . '/login.php' ?>">Connexion</a>
-                <a class="<?= ($activePage ?? '') === 'register' ? 'active' : '' ?>" href="<?= $navBase . '/register.php' ?>">Inscription</a>
+                <a class="<?= ($activePage ?? '') === 'login' ? 'active' : '' ?>" href="/guest/login.php">Connexion</a>
+                <a class="<?= ($activePage ?? '') === 'register' ? 'active' : '' ?>" href="/guest/register.php">Inscription</a>
             <?php endif; ?>
         </nav>
     </div>
